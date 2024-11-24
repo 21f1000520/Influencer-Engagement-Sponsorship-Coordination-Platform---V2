@@ -1,6 +1,7 @@
 from flask import Flask
 from extentions import db, security
-
+from create_initial_data import create_data
+import entry_views
 def create_app():
     app = Flask(__name__)
 
@@ -16,18 +17,29 @@ def create_app():
 
     # cache config
     app.config["DEBUG"] = True         # some Flask specific configs
+    app.config["CACHE_DEFAULT_TIMEOUT"] = 300
+    app.config["CACHE_TYPE"] = "RedisCache"
+    app.config["CACHE_REDIS_PORT"] = 6379
 
     db.init_app(app)
 
     with app.app_context():
-        db.create_all()
+        from models import User, Role
+        from flask_security import SQLAlchemyUserDatastore
 
+        user_datastore = SQLAlchemyUserDatastore(db, User, Role) 
+        security.init_app(app, user_datastore)
+        db.create_all()
+        create_data(user_datastore)
     # disable CSRF security
     app.config['WTF_CSRF_CHECK_DEFAULT'] = False
     app.config['SECURITY_CSRF_PROTECT_MECHANISHMS'] = []
     app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
 
+    entry_views.create_view(app, user_datastore)
     return app
+
+
 
 
 if __name__ == "__main__":

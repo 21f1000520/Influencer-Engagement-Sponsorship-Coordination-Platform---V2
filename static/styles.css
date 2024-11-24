@@ -1,0 +1,9 @@
+body {
+    /* background: linear-gradient(to right, #f7ba57, #a6fffb); */
+    background-color: rgb(210, 233, 233);
+}
+
+.nav-item{
+    margin-left: 5px;
+    margin-right: 5px;
+}
