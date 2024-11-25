@@ -41,6 +41,7 @@ class influencer_features(db.Model):
     recieved_ad_req = db.relationship('recieved_ad_req', secondary='ad_req_infl_relationship',
                                       back_populates='influencer_features')
     flag = db.Column(db.Boolean, nullable=False, default=False)
+    dp_name = db.Column(db.String, unique=False, nullable=True)
 
 
 class sponsor_features(db.Model):
@@ -49,7 +50,7 @@ class sponsor_features(db.Model):
     industry = db.Column(db.String, unique=False, nullable=False)
     campaigns = db.relationship('campaigns', back_populates='sponsor_features')
     flag = db.Column(db.Boolean, nullable=False, default=False)
-
+    dp_name = db.Column(db.String, unique=False, nullable=True)
 
 class platforms(db.Model):
     id = db.Column(db.Integer, autoincrement=True, primary_key=True)

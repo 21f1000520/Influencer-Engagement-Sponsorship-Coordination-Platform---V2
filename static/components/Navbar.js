@@ -5,21 +5,25 @@ const Navbar = {
   template: `
     <nav  class="h2 navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
         <ul class="navbar-nav">
-            <li class="nav-item" style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/" >Home</router-link>
+            <li class="nav-item"  v-if="!store.getters.getLoginState" style="padding-left: 2px; padding-right: 2px;">
+                <router-link to="/login">Login</router-link>
             </li>
-            <li class="nav-item" style="padding-left: 2px; padding-right: 2px;">
-                <router-link v-if="!store.getters.getLoginState" to="/login">Login</router-link>
+            <li class="nav-item" v-if="!store.getters.getLoginState"  style="padding-left: 2px; padding-right: 2px;">
+                <router-link to="/register">Register</router-link>
             </li>
-            
-            <li class="nav-item" style="padding-left: 2px; padding-right: 2px;">
-                <router-link v-if="!store.getters.getLoginState" to="/register">Register</router-link>
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'admin'"  style="padding-left: 2px; padding-right: 2px;">
+                <router-link to="/dashboard-admin">Dashboard</router-link>
             </li>
-            <li class="nav-item" style="padding-left: 2px; padding-right: 2px;">
-                <router-link v-if="store.getters.getLoginState" to="/dashboard-admin">Dashboard</router-link>
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'infl'"  style="padding-left: 2px; padding-right: 2px;">
+                <router-link to="/dashboard-infl">Dashboard</router-link>
             </li>
-            <li class="nav-item" style="padding-left: 10px; padding-right: 0px;">
-                <button class="btn btn-danger text-xl" v-if="store.getters.getLoginState" @click="logout">Logout</button>
+
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'spons'"  style="padding-left: 2px; padding-right: 2px;">
+                <router-link to="/dashboard-spons">Dashboard</router-link>
+            </li>
+
+            <li class="nav-item" v-if="store.getters.getLoginState"  style="padding-left: 10px; padding-right: 0px;">
+                <button class="btn btn-danger text-xl" @click="logout">Logout</button>
             </li>
       </ul>
       </nav>
@@ -34,8 +38,8 @@ const Navbar = {
       this.$store.commit("logout");
       this.$store.commit("setRole", null);
       console.log(this.$store.getters.getLoginState,'login state after logout');
+      this.$router.push("/login");
       this.$router.go();
-      this.$router.push("/");
 
     },
   },

@@ -13,10 +13,12 @@ const Register = {
         <div class="form-group mb-4">
           <label for="password" class="form-label">Password*</label>
           <input v-model="password" type="password" class="form-control" placeholder="Password" id="password" required/>
+          <div v-if="this.password.length<4" id="plateform_validation">Password length should be atleast 4</div>
         </div>
         <div class="form-group mb-4">
           <label for="fname" class="form-label">First Name*</label>
           <input v-model="fname" type="text" class="form-control" placeholder="First Name" id="fname" required/>
+          <div v-if="this.fname.length===0" id="plateform_validation">Enter First Name</div>
         </div>
         <div class="form-group mb-4">
           <label for="lname" class="form-label">Last Name</label>
@@ -46,6 +48,7 @@ const Register = {
         <div v-if="role==='spons'" class="form-group mb-4">
           <label for="industry" class="form-label">Industry*</label>
           <input  v-model="industry" class="form-control" id="industry" type="text" required/>
+          <div v-if="this.industry.length===0" id="plateform_validation">Enter Industry</div>
         </div>
 
         <button class="btn btn-primary w-100" @click="click_submit">Submit</button>
@@ -65,6 +68,7 @@ const Register = {
       error_email:"",
       error_plateform:"",
       error_role:"",
+      error_password:"",
     };
   },
 
@@ -81,7 +85,25 @@ computed: {
     
     isRole(){
       return this.role.length>0
-    }
+    },
+
+    passwordCheck(){
+      if (this.password.length<4){
+        this.error_password="Password should be atleast 4 character long";
+        return false;
+      }
+      this.error_password=""
+      return true;
+    },
+
+    firstNameCheck(){
+      if (this.fname.length===0){
+        return false;
+      }
+      return true;
+    },
+
+    
   },
   
   methods: {
@@ -89,14 +111,13 @@ computed: {
       if (this.role==='infl'){
           console.log(this.platforms.length)
           if (this.platforms.length===0){
-          this.error_plateform="select atleast one plateform";
-          console.log('plateform wrong')
-          return false;
-          } else{
-          this.error_plateform="";
-          return true;
-
-         }
+            this.error_plateform="select atleast one plateform";
+            console.log('plateform wrong')
+            return false;
+            } else{
+              this.error_plateform="";
+              return true;
+               }
         } else {
             return true
           }
@@ -115,6 +136,13 @@ computed: {
         
         alert('select Role');
       }
+      if (this.error_password){
+        alert(this.error_password);
+      }
+
+      if (!this.firstNameCheck){
+        alert('Enter First Name');
+      }
 
     },
     // validateEmail() {
@@ -130,7 +158,7 @@ computed: {
       console.log(this.error_email)
       console.log(this.error_plateform)
       console.log(this.role.length)
-      if (this.error_email !== "" || this.error_plateform!=="" || !this.isRole){
+      if (this.error_email !== "" || this.error_plateform!=="" || !this.isRole || !this.passwordCheck || !this.firstNameCheck){
         this.error_show();
       }else{
         this.submitInfo();

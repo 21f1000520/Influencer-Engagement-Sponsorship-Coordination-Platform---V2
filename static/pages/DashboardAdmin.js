@@ -56,7 +56,8 @@ const DashboardAdmin = {
                                 <button v-if="!sponsor.flag" type="button" class="btn btn-danger" @click="Switch_Flag(sponsor.id)">Flag</button>
                                 <button v-if="sponsor.flag" type="button" class="btn btn-primary"  @click="Switch_Flag(sponsor.id)">Unflag</button> 
                                 <button v-if="!sponsor.active" type="button" class="btn btn-primary" @click="Switch_active(sponsor.id)">Activate</button>
-                                <button v-if="sponsor.active" type="button" class="btn btn-danger"  @click="Switch_active(sponsor.id)">De-activate</button> 
+                                <button v-if="sponsor.active" type="button" class="btn btn-danger" @click="Switch_inactive(sponsor.id)">De-Activate</button>
+                                
                             </td>
 
                         </tr>
@@ -73,11 +74,74 @@ const DashboardAdmin = {
     },
 
     methods:{
-        Switch_Flag(id){
+        async Switch_Flag(id){
             console.log('flag switch',id);
+            const origin = window.location.origin;
+            const url = `${origin}//switch-flag/${id}`;
+            const res = await fetch(url,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authentication-Token":sessionStorage.getItem("token"),
+                    },
+                });
+             if (res.ok){
+                console.log('Switched');
+                let datas = await res.json();
+                console.log(datas)
+                if (datas.flag){
+                    alert('Flagged');
+                }else{
+                    alert('Un-Flagged')
+                }
+                this.$router.go();
+             }else {
+                const errorData = await res.json();
+                console.error("could not flag, failed:", errorData);
+            }
+
         },
-        Switch_active(id){
+
+        async Switch_active(id){
             console.log('active switch',id);
+            const origin = window.location.origin;
+            const url = `${origin}/activate_spons/${id}`;
+            const res = await fetch(url,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authentication-Token":sessionStorage.getItem("token"),
+                    },
+                });
+             if (res.ok){
+                console.log('activated');
+                alert('Activated');
+                this.$router.go();
+             }else {
+                const errorData = await res.json();
+                console.error("could not activate, failed:", errorData);
+            }
+        },
+
+        async Switch_inactive(id){
+            console.log('Deactive switch',id);
+            const origin = window.location.origin;
+            const url = `${origin}/deactivate_spons/${id}`;
+            const res = await fetch(url,{
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authentication-Token":sessionStorage.getItem("token"),
+                    },
+                });
+             if (res.ok){
+                console.log('deactivated');
+                alert('De-Activated');
+                this.$router.go();
+             }else {
+                const errorData = await res.json();
+                console.error("could not deactivate, failed:", errorData);
+            }
         },
     },
 
@@ -95,7 +159,7 @@ const DashboardAdmin = {
         if (res.ok){
             const datas = await res.json();
             this.all_influencers = datas;
-            console.log(datas);
+            // console.log(datas);
         }else {
           const errorData = await res.json();
           console.error("No influencers could be found, failed:", errorData);
@@ -113,7 +177,7 @@ const DashboardAdmin = {
         if (res.ok){
             const datas2 = await res2.json();
             this.all_sponsors = datas2;
-            console.log(datas2);
+            // console.log(datas2);
         }else {
           const errorData = await res.json();
           console.error("No sponsor could be found, failed:", errorData);

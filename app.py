@@ -3,6 +3,9 @@ from extentions import db, security
 from create_initial_data import create_data
 import entry_views
 import admin_views
+import dashboard_views
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 def create_app():
     app = Flask(__name__)
 
@@ -10,6 +13,7 @@ def create_app():
     app.config['SECRET_KEY'] = "should-not-be-exposed"
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///data.db"
     app.config['SECURITY_PASSWORD_SALT'] = 'salty-password'
+    app.config['UPLOAD_FOLDER'] = os.path.join(basedir, "static/images")
 
     # configure token
     app.config['SECURITY_TOKEN_AUTHENTICATION_HEADER'] = 'Authentication-Token'
@@ -39,6 +43,7 @@ def create_app():
 
     entry_views.create_entery_view(app, user_datastore)
     admin_views.create_admin_views(app,user_datastore)
+    dashboard_views.create_dashboard_views(app,user_datastore)
     return app
 
 

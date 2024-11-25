@@ -13,8 +13,12 @@ const Login = {
         </div>
         <div id = "loginError" class="form-group mb-4"  v-if="this.notFound"> No Such User Exist </div>
         <div id = "loginError" class="form-group mb-4"  v-if="this.wrongPass"> Wrong Password </div>
+        <div id = "loginError" class="form-group mb-4"  v-if="this.notActive"> User must be activated first by the Admin </div>
 
         <button class="btn btn-primary w-100" @click="submitInfo">Submit</button>
+        <div class="block2">
+        <router-link to="/register">Register</router-link>
+        </div>
       </div>
     </div>
   `,
@@ -24,6 +28,7 @@ const Login = {
       password: "",
       notFound:false,
       wrongPass:false,
+      notActive:false,
     };
   },
   methods: {
@@ -72,8 +77,12 @@ const Login = {
         if (data.message==='wrong password'){
           this.wrongPass=true;
         }
-        setTimeout(() => this.wrongPass = false, 1000)
-        setTimeout(() => this.notFound = false, 1000)
+        if (data.message==='User not activated'){
+          this.notActive=true;
+        }
+        setTimeout(() => this.wrongPass = false, 3000)
+        setTimeout(() => this.notFound = false,  3000)
+        setTimeout(() => this.notActive = false, 3000)
         console.error("Login Failed");
       }
     },

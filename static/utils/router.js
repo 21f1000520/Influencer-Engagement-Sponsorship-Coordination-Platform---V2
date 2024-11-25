@@ -3,10 +3,11 @@ import Home from "../pages/Home.js";
 import Login from "../pages/Login.js";
 import Register from "../pages/Register.js";
 // import Logout from "../pages/Logout.js";
-// import DashboardStud from "../pages/DashboardStud.js";
-// import DashboardInst from "../pages/DashboardInst.js";
+import DashboardInfl from "../pages/DashboardInfl.js";
+import DashboardSpons from "../pages/DashboardSpons.js";
 import DashboardAdmin from "../pages/DashboardAdmin.js";
 // import Profile from "../pages/Profile.js";
+import UpdateUser from "../pages/UpdateUser.js";
 
 import store from "./store.js";
 
@@ -15,20 +16,27 @@ const routes = [
   { path: "/login", component: Login },
   { path: "/register", component: Register },
 //   { path: "/logout", component: Logout },
-//   {
-//     path: "/dashboard-stud",
-//     component: DashboardStud,
-//     meta: { requiresLogin: true, role: "stud" },
-//   },
-//   {
-//     path: "/dashboard-inst",
-//     component: DashboardInst,
-//     meta: { requiresLogin: true, role: "inst" },
-//   },
+  {
+    path: "/dashboard-infl",
+    component: DashboardInfl,
+    meta: { requiresLogin: true, role: "infl" },
+  },
+
+  {
+    path: "/dashboard-spons",
+    component: DashboardSpons,
+    meta: { requiresLogin: true, role: "spons" },
+  },
+  
   {
     path: "/dashboard-admin",
     component: DashboardAdmin,
     meta: { requiresLogin: true, role: "admin" },
+  },
+  {
+    path: "/update-user",
+    component: UpdateUser,
+    meta: { requiresLogin: true },
   },
 //   { path: "/profile", component: Profile, meta: { loggedIn: true } },
 ];
