@@ -2,6 +2,7 @@ from flask import Flask
 from extentions import db, security
 from create_initial_data import create_data
 import entry_views
+import admin_views
 def create_app():
     app = Flask(__name__)
 
@@ -36,7 +37,8 @@ def create_app():
     app.config['SECURITY_CSRF_PROTECT_MECHANISHMS'] = []
     app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
 
-    entry_views.create_view(app, user_datastore)
+    entry_views.create_entery_view(app, user_datastore)
+    admin_views.create_admin_views(app,user_datastore)
     return app
 
 

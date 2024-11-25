@@ -37,6 +37,7 @@ class influencer_features(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     plateforms = db.relationship('platforms', secondary='infl_plateform',
                                  back_populates='influencer_features')
+    aboutMe = db.Column(db.String, unique=False, nullable=True)
     recieved_ad_req = db.relationship('recieved_ad_req', secondary='ad_req_infl_relationship',
                                       back_populates='influencer_features')
     flag = db.Column(db.Boolean, nullable=False, default=False)
@@ -45,7 +46,7 @@ class influencer_features(db.Model):
 class sponsor_features(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    industry = db.Column(db.String, unique=True, nullable=False)
+    industry = db.Column(db.String, unique=False, nullable=False)
     campaigns = db.relationship('campaigns', back_populates='sponsor_features')
     flag = db.Column(db.Boolean, nullable=False, default=False)
 

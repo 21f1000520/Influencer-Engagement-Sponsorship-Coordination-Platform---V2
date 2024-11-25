@@ -2,28 +2,8 @@ from flask_security import SQLAlchemyUserDatastore
 from flask_security.utils import hash_password
 from extentions import db
 from models import platforms,influencer_features,sponsor_features
+from helper_functions import get_or_create,get_or_create_features
 
-
-def get_or_create(session, model, **kwargs):
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        return instance
-    elif not instance:
-        instance = model(**kwargs)
-        session.add(instance)
-        return instance
-
-
-def get_or_create_features(session, model,plateforms, **kwargs):
-    instance = session.query(model).filter_by(**kwargs).first()
-    if instance:
-        print('found')
-        return instance
-    elif not instance:
-        instance = model(**kwargs)
-        instance.plateforms.extend(plateforms)
-        session.add(instance)
-        return instance
 
 
 
@@ -50,7 +30,7 @@ def create_data(user_datastore: SQLAlchemyUserDatastore):
             email="influencer@iitm.ac.in", password=hash_password('1234'), active=True, roles=['infl'])
         influencer = user_datastore.find_user(email="influencer@iitm.ac.in")
         # print(influencer)
-        InF = get_or_create_features(db.session, influencer_features,plateforms=[Youtube,Instagram], user_id=influencer.id)
+        InF = get_or_create_features(db.session, influencer_features,plateforms=[Youtube,Instagram], user_id=influencer.id,aboutMe='I am a Youtuber and Instagrammer')
     if not user_datastore.find_user(email="sponsor@iitm.ac.in"):
         user_datastore.create_user(fname='First', lname='Sponsor',
             email="sponsor@iitm.ac.in", password=hash_password('1234'), active=True, roles=['spons'])
