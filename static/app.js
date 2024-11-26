@@ -1,6 +1,8 @@
 import router from "./utils/router.js";
 import Navbar from "./components/Navbar.js";
 import store from "./utils/store.js";
+import AddCamp from "./components/AddCampaign.js";
+import UpdateUser from "./components/UpdateUser.js";
 
 
 new Vue({
@@ -14,6 +16,6 @@ new Vue({
   router,
   store,
   components: {
-    Navbar,
+    Navbar,AddCamp,UpdateUser
   },
 });

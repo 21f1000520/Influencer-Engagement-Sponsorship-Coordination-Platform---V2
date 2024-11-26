@@ -9,7 +9,7 @@ from models import influencer_features, sponsor_features
 
 def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
     @app.route('/users/<role>',methods=['GET'])
-    @roles_required('admin')
+    @roles_accepted('admin','spons')
     def get_influencers(role):
         print(role)
         all_users = user_datastore.user_model().query.all()

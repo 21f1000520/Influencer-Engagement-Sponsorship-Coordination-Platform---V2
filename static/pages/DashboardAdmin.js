@@ -77,7 +77,7 @@ const DashboardAdmin = {
         async Switch_Flag(id){
             console.log('flag switch',id);
             const origin = window.location.origin;
-            const url = `${origin}//switch-flag/${id}`;
+            const url = `${origin}/switch-flag/${id}`;
             const res = await fetch(url,{
                 method: "GET",
                 headers: {

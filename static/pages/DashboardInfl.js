@@ -1,7 +1,10 @@
+import all_campaigns from "../components/All_camps.js";
+
+
 const DashboardInfl = {
   template: `<div class="row d-flex justify-content-center">
               <div class="col-8  justify-content-center" style="text-align: center;">
-                <h1 class="block" style="background: red;">Welcome {{this.user_data.fname}}</h1>
+                <h1 class="block " style="background: rgb(200, 30, 30);">Welcome {{this.user_data.fname}}</h1>
                 <div v-if="this.flagged" class="alert alert-danger" role="alert"> 
                   <h1>You Have been Flagged by Admin, contact Admin!!!</h1>
                 </div>
@@ -10,7 +13,7 @@ const DashboardInfl = {
 
                     <div class="row align-items-center" >
 
-                        <div class="col-4 align-items-center" style="margin-top: 1%;">
+                        <div class="col-4 align-items-center rounded" style="margin-top: 1%;">
                           <img v-bind:src="'/static/images/'+imagename" class="rounded mx-auto d-block img-fluid" alt="Profile Picture" style="width: 200px;">
                           <div class="form-container">
                             <label for = "file" class="form-label">Upload Profile Pic</label>
@@ -24,19 +27,19 @@ const DashboardInfl = {
                         
                         <div class="col-1"></div>
                         
-                        <div class="col-7 " style="margin-top: 0%; background:rgb(210, 233, 233);">
-                            <ul class="list-group list-group-flush" >
-                                <li class="list-group-item"> {{this.user_data.fname}} {{this.user_data.lname}} </li>
-                                <li class="list-group-item"> {{this.user_data.email}} </li>
-                                <li class="list-group-item" v-if="this.user_data.role==='infl'">
-                                  <span class="badge bg-secondary" style="margin-left:5%;" v-for="(plt,index2) in this.user_data.plateforms"> 
+                        <div class="col-7 shadow-lg p-3 mb-5 bg-transparent rounded" style="margin-top: 0%; background:rgb(210, 233, 233); width:50%; border-radius: 50px;">
+                            <ul class="list-group list-group-flush bg-transparent" >
+                                <li class="list-group-item display-5 bg-transparent"> {{this.user_data.fname}} {{this.user_data.lname}} </li>
+                                <li class="list-group-item h5 bg-transparent"> {{this.user_data.email}} </li>
+                                <li class="list-group-item h5 bg-transparent" v-if="this.user_data.role==='infl'">
+                                  <span class="badge bg-secondary h5" style="margin-left:5%;" v-for="(plt,index2) in this.user_data.plateforms"> 
                                     {{ plt }}
                                   </span>
                                 </li>
-                                <li class="list-group-item" style="columns: red;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
+                                <li class="list-group-item h5 text-muted bg-transparent" style="columns: red;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
                             </ul>
                             <div style="margin-top:5%">
-                                <a class="btn btn-outline-info" @click="update_profile"> Update Profile </a>
+                                <a class="btn btn-outline-info h2" @click="update_profile"> Update Profile </a>
                             </div>
                         </div>
 
@@ -46,6 +49,12 @@ const DashboardInfl = {
                 </div>
                 
               </div>
+                <div class="row d-flex justify-content-center">
+                <div class="col-8  justify-content-center" style="text-align: center;">
+                  <button type="button" class="btn btn-danger" @click="view_all_camps" style="border-radius: 26px;">View Campaigns</button>
+                  <all_campaigns v-if="this.showCamps" :camps="all_camps"/>
+                </div>
+                </div>
             </div>
             `,
   data(){
@@ -55,9 +64,35 @@ const DashboardInfl = {
       imagename:"sample.jpg",
       file:null,
       filename:null,
-      showupload:false
+      showupload:false,
+      showCamps:false,
+      all_camps:{},
      }
   },
+
+  async beforeMount(){
+    console.log('before mount')
+    const origin = window.location.origin;
+    const url = `${origin}/get_all_campaigns`;
+    const res = await fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "Authentication-Token":sessionStorage.getItem("token"),
+      },
+    });
+    if (res.ok){
+        const datas = await res.json();
+        // this.all_influencers = datas;
+        console.log(datas);
+        this.all_camps=datas;
+        
+    }else {
+      const errorData = await res.json();
+      console.error("No campaigns", errorData);
+    }
+  },
+
   async mounted(){
     console.log('mounted')
     const origin = window.location.origin;
@@ -79,7 +114,8 @@ const DashboardInfl = {
     }else {
       const errorData = await res.json();
       console.error("No current user:", errorData);
-      
+      sessionStorage.clear()
+      this.$router.push("/login");
     }
 
     if (this.user_data.dp_name){
@@ -149,7 +185,15 @@ const DashboardInfl = {
       console.error("could not upload:", errorData);
       
     }
+    },
+
+    view_all_camps(){
+      console.log('view camps')
+      this.showCamps=!this.showCamps
     }
+  },
+  components:{
+    all_campaigns
   }
 
 };

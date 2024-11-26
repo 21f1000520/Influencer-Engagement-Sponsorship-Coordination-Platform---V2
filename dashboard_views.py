@@ -3,9 +3,10 @@ from flask_security import auth_required, current_user, roles_required, roles_ac
 from flask_security.utils import hash_password, verify_password
 from extentions import db
 from helper_functions import get_or_create, get_or_create_features
-import datetime
+from datetime import datetime
 import os
-from models import influencer_features, sponsor_features,platforms
+from models import influencer_features, sponsor_features,platforms,campaigns
+from models import recieved_infl_req,recieved_ad_req
 
 
 def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
@@ -117,3 +118,235 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             db.session.rollback()
             return jsonify({'message': 'error while updating user'}), 408
     
+    @app.route('/add_campaign', methods=['POST'])
+    @roles_required("spons")
+    def add_campaign():
+        print(current_user)
+        data = request.get_json()
+        name= data.get("name")
+        description = data.get("description")
+        startDate = datetime.strptime(data.get("startDate"), '%Y-%m-%d')
+        endDate = datetime.strptime(data.get("endDate"), '%Y-%m-%d')
+        budget = data.get("budget")
+        goal = data.get("goal")
+        visibility = data.get("visibility")
+        
+        camp_new = campaigns(name=name, description=description,
+                             start_date=startDate, end_date=endDate,
+                             budget=budget, goals=goal, visibility=visibility, s_id=current_user.id)
+        db.session.add(camp_new)
+        SpF = db.session.query(
+            sponsor_features).filter_by(user_id=current_user.id).first()
+        SpF.campaigns.append(camp_new)
+        try:
+            db.session.commit()
+            return jsonify({"data":data,"message":'Campaign added successfully'}),200
+        except Exception:
+            db.session.rollback()
+            return jsonify({"data": data, "message": 'Campaign addition failed'}), 408
+
+    @app.route('/get_campaigns', methods=['GET'])
+    @roles_required("spons")
+    def get_campaigns():
+        SpF = db.session.query(
+            sponsor_features).filter_by(user_id=current_user.id).first()
+        camps = SpF.campaigns
+        if not camps:
+            return jsonify({'message':'No campaigns found'}),404
+        
+        camp_array=[]
+        for camp in camps:
+            camp_array.append({'name':camp.name,'description':camp.description,
+                               'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                               'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                               'flag':camp.flag,'id':camp.id})
+        return jsonify(camp_array)
+    
+
+    @app.route('/delete_campaigns/<id>', methods=['DELETE'])
+    @roles_required("spons")
+    def delete_campaigns(id):
+        SpF = db.session.query(
+            sponsor_features).filter_by(user_id=current_user.id).first()
+        camp_del = campaigns.query.filter(
+            (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
+        
+
+        # camps = SpF.campaigns
+        # if not camps:
+        #     return jsonify({'message':'No campaigns found'}),404
+        print(camp_del.name)
+        SpF.campaigns.remove(camp_del)
+        db.session.delete(camp_del)
+
+        try:
+            db.session.commit()
+            return jsonify({'camp deleted ':camp_del.name}),200
+        except Exception:
+            db.session.rollback()
+            return jsonify({"message": 'Could not delete'}), 408
+        
+    @app.route('/update_campaigns/<id>', methods=['PUT'])
+    @roles_required("spons")
+    def update_campaigns(id):
+        SpF = db.session.query(
+            sponsor_features).filter_by(user_id=current_user.id).first()
+        current_camp = campaigns.query.filter(
+            (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
+
+
+
+        if not current_camp:
+            return jsonify({'message': 'No such campaign with this id'}), 404
+        
+        data = request.get_json()
+        name = data.get("name")
+        description = data.get("description")
+        startDate=""
+        if data.get("startDate"):
+            startDate = datetime.strptime(data.get("startDate"), '%Y-%m-%d')
+        endDate=""
+        if data.get("endDate"):
+            endDate = datetime.strptime(data.get("endDate"), '%Y-%m-%d')
+        budget = data.get("budget")
+        goal = data.get("goal")
+        visibility = data.get("visibility")
+        # return jsonify(data)
+        if name:
+            current_camp.name=name
+        if description:
+            current_camp.description = description
+        if startDate:
+            current_camp.startDate = startDate
+        if endDate:
+            current_camp.endDate = endDate
+        if budget:
+            current_camp.budget = budget
+        if goal:
+            current_camp.goal = goal
+        if visibility != "":
+            current_camp.visibility = visibility
+
+        # find the index of current campaign
+        i = SpF.campaigns.index(current_camp)
+        SpF.campaigns = SpF.campaigns[:i]+[current_camp]+SpF.campaigns[i+1:]
+        try:
+            db.session.commit()
+            return jsonify({'message': 'Campaign Updated', "Campaign": current_camp.name, 'visibility': current_camp.visibility}), 200
+        except:
+            print('error while updating')
+            db.session.rollback()
+            return jsonify({'message': 'error while updating campaign'}), 408
+        
+    @app.route('/get_campaign/<id>', methods=['GET'])
+    @roles_required("spons")
+    def get_campaign(id):
+        SpF = db.session.query(
+            sponsor_features).filter_by(user_id=current_user.id).first()
+        camp = campaigns.query.filter(
+            (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
+        return jsonify({'name': camp.name, 'description': camp.description,
+                        'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                        'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                               'flag': camp.flag,'id':camp.id})
+    
+    @app.route('/get_all_campaigns', methods=['GET'])
+    @roles_accepted("admin","infl")
+    def get_all_campaign():
+        camps = campaigns.query.all()
+        camp_array = []
+        for camp in camps:
+            sponsor = user_datastore.find_user(id=camp.s_id)
+            sname = sponsor.fname+' '+sponsor.lname
+            if camp.visibility:
+                camp_array.append({'name': camp.name, 'description': camp.description,
+                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                'flag': camp.flag, 'id': camp.id,'sponsor_id':camp.s_id,'sponsor_name':sname})
+        # print(camp_array)
+        return jsonify(camp_array)
+    
+    @app.route('/send_ad_req_to_spons/<c_id>',methods=['GET'])
+    @roles_accepted("infl")
+    def send_req_to_spons(c_id):
+
+        target_camp = campaigns.query.filter_by(id=c_id).first()
+        if not target_camp:
+            return jsonify({'message':'No Such Campaign'}),404
+        sponsor_id = target_camp.s_id
+
+        check = recieved_infl_req.query.filter(
+            (recieved_infl_req.camp_id == c_id) & (recieved_infl_req.inf_id == current_user.id)).first()
+
+        if check:
+            return jsonify({'message':'Already Sent'}),400
+
+        req = recieved_infl_req(inf_id=current_user.id,s_id=sponsor_id,camp_id=c_id)
+        db.session.add(req)
+        try:
+            db.session.commit()
+            return jsonify({"message":"sent req to spons"})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'Could not send','error':e}), 408
+
+    @app.route('/send_ad_req_to_infl/<c_id>/<infl_id>', methods=['GET'])
+    @roles_accepted("spons")
+    def send_req_to_infl(c_id,infl_id):
+        print(c_id, infl_id)
+        InF = influencer_features.query.filter_by(user_id=infl_id).first()
+
+        if not InF:
+            jsonify({"message":"no such influencer found"}),404
+
+        check = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
+            recieved_ad_req.infl_id == infl_id)).first()
+        if check:
+            return jsonify({'message': 'Already Sent'}), 400
+        
+        
+        req = recieved_ad_req(infl_id=infl_id,campaign_id=c_id,s_id=current_user.id)
+        req.influencer_features.append(InF)
+        db.session.add(req)
+        try:
+            db.session.commit()
+            return jsonify({"message": "sent req to infl"})
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'Could not send', 'error': e}), 408
+
+    @app.route('/get_all_req_to_inf', methods=['GET'])
+    @auth_required('token')
+    def get_all_req_infl():
+        all_req = recieved_ad_req.query.all()
+        if not all_req:
+            jsonify({"message": "No req sent to influencers"}), 404
+        reqs_json=[]
+        for req in all_req:
+            InFs = req.influencer_features
+            reqs_json.append({
+                'id':req.id,
+                'influencer_id':req.infl_id,
+                'campaign_id':req.campaign_id,
+                'sponsor_id':req.s_id,
+                'status':req.status,
+                'influencers':[inf.user_id for inf in InFs]
+            })
+        return jsonify(reqs_json),200
+
+    @app.route('/get_all_req_to_spons', methods=['GET'])
+    @auth_required('token')
+    def get_all_req_spons():
+        all_req = recieved_infl_req.query.all()
+        if not all_req:
+            jsonify({"message": "No req sent to influencers"}), 404
+        reqs_json = []
+        for req in all_req:
+            reqs_json.append({
+                'id': req.id,
+                'influencer_id': req.inf_id,
+                'sponsor_id': req.s_id,
+                'campaign_id': req.camp_id,
+                'status': req.status
+            })
+        return jsonify(reqs_json),200

@@ -7,14 +7,21 @@ import DashboardInfl from "../pages/DashboardInfl.js";
 import DashboardSpons from "../pages/DashboardSpons.js";
 import DashboardAdmin from "../pages/DashboardAdmin.js";
 // import Profile from "../pages/Profile.js";
-import UpdateUser from "../pages/UpdateUser.js";
+import UpdateUser from "../components/UpdateUser.js";
+import AddCamp from "../components/AddCampaign.js";
+
 
 import store from "./store.js";
 
+
 const routes = [
-  { path: "/", component: Home },
-  { path: "/login", component: Login },
-  { path: "/register", component: Register },
+  { path: "/", 
+    component: Login,
+    meta:{requiresLogout:true}, 
+  },
+
+  { path: "/login", component: Login, meta:{requiresLogout:true},  },
+  { path: "/register", component: Register,meta:{requiresLogout:true},  },
 //   { path: "/logout", component: Logout },
   {
     path: "/dashboard-infl",
@@ -27,7 +34,7 @@ const routes = [
     component: DashboardSpons,
     meta: { requiresLogin: true, role: "spons" },
   },
-  
+
   {
     path: "/dashboard-admin",
     component: DashboardAdmin,
@@ -36,7 +43,12 @@ const routes = [
   {
     path: "/update-user",
     component: UpdateUser,
-    meta: { requiresLogin: true },
+    meta: { requiresLogin: true, role: "infl" },
+  },
+  {
+    path: "/add_campaign",
+    component: AddCamp,
+    meta: { requiresLogin: true, role: "spons" },
   },
 //   { path: "/profile", component: Profile, meta: { loggedIn: true } },
 ];
@@ -64,6 +76,25 @@ router.beforeEach((to, from, next) => {
   } else {
     console.log('does not require log in');
     next();
+  }
+  if (to.matched.some((record) => record.meta.requiresLogout)) {
+    console.log('require logout')
+    if (store.getters.getLoginState) {
+      console.log('inside loggedIn true');
+      switch (store.getters.getRole) {
+          case "spons":
+            next({ path: "/dashboard-spons" });
+            break;
+          case "infl":
+             next({ path: "/dashboard-infl" });
+            break;
+          case "admin":
+             next({ path: "/dashboard-admin" });
+        }
+    }else {
+    console.log('does not require log out');
+    next();
+  }
   }
 });
 
