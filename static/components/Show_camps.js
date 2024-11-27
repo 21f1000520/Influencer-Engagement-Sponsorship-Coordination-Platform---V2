@@ -116,9 +116,7 @@ const show_campaigns={
             </tbody>
         </table>
 
-        <div v-if="running_req_camp.length>0">
-            running requests are present
-        </div>
+
     </div>
     `,
 

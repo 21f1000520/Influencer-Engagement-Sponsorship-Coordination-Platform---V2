@@ -113,9 +113,7 @@ const camp_dashboard={
                 </tr>
                 </tbody>
             </table>   
-            <div v-if="running_req_inf.length>0">
-                running requests are present
-            </div>
+
         <button class="btn btn-secondary shadow-lg" style="border-radius: 120px;" @click="$emit('ClosePopup')">&#10060 Close</button>
         </div>
     </div>

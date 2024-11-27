@@ -272,9 +272,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                 invisible = recieved_ad_req.query.filter(
                     (recieved_ad_req.infl_id == current_user.id) & (recieved_ad_req.campaign_id==camp.id)).first()
                 if invisible:
-                    print(invisible)
-                    print("invisible recieved detected",
-                          recieved_ad_req.infl_id, current_user.id, '--', recieved_ad_req.campaign_id, camp.id)
+                    # print(invisible)
                     camp_array.append({'name': camp.name, 'description': camp.description,
                                        'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
                                        'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
@@ -462,3 +460,65 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         except Exception as e:
             db.session.rollback()
             return jsonify({"message": 'reject failed', 'error': e}), 408
+
+    @app.route('/get_all_running', methods=['GET'])
+    @auth_required('token')
+    def get_all_running():
+        role = current_user.roles[0].name
+        if role=='spons':
+            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.s_id==current_user.id) & 
+                                                           (recieved_ad_req.status=='accepted')).all()
+            running_to_spons = recieved_infl_req.query.filter((recieved_infl_req.s_id == current_user.id) &
+                                                              (recieved_infl_req.status == 'accepted')).all()
+        elif role=='infl':
+            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.infl_id==current_user.id) & 
+                                                           (recieved_ad_req.status == 'accepted')).all()
+            running_to_spons = recieved_infl_req.query.filter((recieved_infl_req.inf_id == current_user.id) &
+                                                              (recieved_infl_req.status == 'accepted')).all()
+        elif role=='admin':
+            running_to_infl = recieved_ad_req.query.filter_by(
+                status='accepted').all()
+            running_to_spons = recieved_infl_req.query.filter_by(
+                status='accepted').all()
+        
+        if not running_to_infl and not running_to_spons:
+            return jsonify({'message':'nothing is runnign'}),404
+
+        camp_array = []
+        if running_to_infl:
+            for r_to_i in running_to_infl:
+                camp = campaigns.query.filter_by(id=r_to_i.campaign_id).first()
+                sponsor = user_datastore.find_user(id=camp.s_id)
+                influencer =  user_datastore.find_user(id=r_to_i.infl_id)
+                sname = sponsor.fname+' '+sponsor.lname
+                inf_name = influencer.fname+' '+influencer.lname
+                InF = db.session.query(
+                    influencer_features).filter_by(user_id=influencer.id).first()
+                SpF = db.session.query(
+                    sponsor_features).filter_by(user_id=sponsor.id).first()
+                
+                camp_array.append({'name': camp.name, 'description': camp.description,
+                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
+                                'influencer_id':influencer.id,'influencer_name':inf_name,'sponsor_active':sponsor.active,
+                                'influencer_active':influencer.active,'sponsor_flag':SpF.flag,'influencer_flag':InF.flag})
+        if running_to_spons:
+            for r_to_s in running_to_spons:
+                camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
+                sponsor = user_datastore.find_user(id=camp.s_id)
+                influencer = user_datastore.find_user(id=r_to_s.inf_id)
+                sname = sponsor.fname+' '+sponsor.lname
+                inf_name = influencer.fname+' '+influencer.lname
+                InF = db.session.query(
+                    influencer_features).filter_by(user_id=influencer.id).first()
+                SpF = db.session.query(
+                    sponsor_features).filter_by(user_id=sponsor.id).first()
+
+                camp_array.append({'name': camp.name, 'description': camp.description,
+                                   'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                   'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                   'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
+                                   'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
+                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag})
+        return jsonify(camp_array),200

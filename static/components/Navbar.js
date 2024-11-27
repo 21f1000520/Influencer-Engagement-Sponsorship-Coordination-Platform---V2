@@ -22,7 +22,7 @@ const Navbar = {
                  <router-link to="/dashboard-spons"><button type="button" class="btn btn-warning bt-custom-dashboard shadow" >Dashboard</button></router-link>
             </li>
 
-            <li class="nav-item"  v-if="store.getters.getLoginState && ['spons','infl'].includes(store.getters.getRole)"  >
+            <li class="nav-item"  v-if="store.getters.getLoginState"  >
                  <router-link to="/stats"><button type="button" class="btn btn-info bt-custom-dashboard shadow" >Stats</button></router-link>
             </li>
 
