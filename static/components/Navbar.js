@@ -3,27 +3,31 @@
 
 const Navbar = {
   template: `
-    <nav  class="h2 navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
+    <nav  class="h2 navbar navbar-expand-sm navbar-dark justify-content-center" >
         <ul class="navbar-nav">
-            <li class="nav-item"  v-if="!store.getters.getLoginState" style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/login">Login</router-link>
+            <li class="nav-item"  v-if="!store.getters.getLoginState"  >
+                <router-link to="/login"><button type="button" class="btn btn-primary bt-custom-login shadow">Login</button></router-link>
             </li>
-            <li class="nav-item" v-if="!store.getters.getLoginState"  style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/register">Register</router-link>
+            <li class="nav-item" v-if="!store.getters.getLoginState"   >
+                <router-link to="/register"><button type="button" class="btn btn-success shadow">Register</button></router-link>
             </li>
-            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'admin'"  style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/dashboard-admin">Dashboard</router-link>
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'admin'"   >
+                <router-link to="/dashboard-admin"><button type="button" class="btn btn-warning bt-custom-dashboard shadow">Dashboard</button></router-link>
             </li>
-            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'infl'"  style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/dashboard-infl">Dashboard</router-link>
-            </li>
-
-            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'spons'"  style="padding-left: 2px; padding-right: 2px;">
-                <router-link to="/dashboard-spons">Dashboard</router-link>
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'infl'"   >
+                <router-link to="/dashboard-infl"><button type="button" class="btn btn-warning bt-custom-dashboard shadow">Dashboard</button></router-link>
             </li>
 
-            <li class="nav-item" v-if="store.getters.getLoginState"  style="padding-left: 10px; padding-right: 0px;">
-                <button class="btn btn-danger text-xl" @click="logout">Logout</button>
+            <li class="nav-item"  v-if="store.getters.getLoginState && store.getters.getRole === 'spons'"  >
+                 <router-link to="/dashboard-spons"><button type="button" class="btn btn-warning bt-custom-dashboard shadow" >Dashboard</button></router-link>
+            </li>
+
+            <li class="nav-item"  v-if="store.getters.getLoginState && ['spons','infl'].includes(store.getters.getRole)"  >
+                 <router-link to="/stats"><button type="button" class="btn btn-info bt-custom-dashboard shadow" >Stats</button></router-link>
+            </li>
+
+            <li class="nav-item" v-if="store.getters.getLoginState"   >
+                <button type="button" class="btn btn-danger shadow" @click="logout">Logout</button>
             </li>
       </ul>
       </nav>
@@ -42,6 +46,7 @@ const Navbar = {
       this.$router.go();
 
     },
+
   },
   computed: {
     store() {

@@ -171,14 +171,19 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         camp_del = campaigns.query.filter(
             (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
         
-
+        sent_req_to_infl = recieved_ad_req.query.filter_by(
+            campaign_id = id).first()
+        sent_req_to_spons = recieved_infl_req.query.filter_by(camp_id=id).first()
         # camps = SpF.campaigns
         # if not camps:
         #     return jsonify({'message':'No campaigns found'}),404
         print(camp_del.name)
         SpF.campaigns.remove(camp_del)
         db.session.delete(camp_del)
-
+        if sent_req_to_infl:
+            db.session.delete(sent_req_to_infl)
+        if sent_req_to_spons:
+            db.session.delete(sent_req_to_spons)
         try:
             db.session.commit()
             return jsonify({'camp deleted ':camp_del.name}),200
@@ -258,11 +263,28 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         for camp in camps:
             sponsor = user_datastore.find_user(id=camp.s_id)
             sname = sponsor.fname+' '+sponsor.lname
-            if camp.visibility:
+            if camp.visibility and current_user.roles[0].name == 'infl':
                 camp_array.append({'name': camp.name, 'description': camp.description,
                                 'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
                                 'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
                                 'flag': camp.flag, 'id': camp.id,'sponsor_id':camp.s_id,'sponsor_name':sname})
+            elif not camp.visibility and current_user.roles[0].name == 'infl':
+                invisible = recieved_ad_req.query.filter(
+                    (recieved_ad_req.infl_id == current_user.id) & (recieved_ad_req.campaign_id==camp.id)).first()
+                if invisible:
+                    print(invisible)
+                    print("invisible recieved detected",
+                          recieved_ad_req.infl_id, current_user.id, '--', recieved_ad_req.campaign_id, camp.id)
+                    camp_array.append({'name': camp.name, 'description': camp.description,
+                                       'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                       'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                       'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname})
+            if current_user.roles[0].name == 'admin':
+                camp_array.append({'name': camp.name, 'description': camp.description,
+                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                'flag': camp.flag, 'id': camp.id,'sponsor_id':camp.s_id,'sponsor_name':sname})
+
         # print(camp_array)
         return jsonify(camp_array)
     
@@ -275,10 +297,12 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({'message':'No Such Campaign'}),404
         sponsor_id = target_camp.s_id
 
-        check = recieved_infl_req.query.filter(
+        check1 = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
+            recieved_ad_req.infl_id == current_user.id)).first()
+        check2 = recieved_infl_req.query.filter(
             (recieved_infl_req.camp_id == c_id) & (recieved_infl_req.inf_id == current_user.id)).first()
 
-        if check:
+        if check1 or check2:
             return jsonify({'message':'Already Sent'}),400
 
         req = recieved_infl_req(inf_id=current_user.id,s_id=sponsor_id,camp_id=c_id)
@@ -299,9 +323,12 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         if not InF:
             jsonify({"message":"no such influencer found"}),404
 
-        check = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
+        check1 = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
             recieved_ad_req.infl_id == infl_id)).first()
-        if check:
+        check2 = recieved_infl_req.query.filter(
+            (recieved_infl_req.camp_id == c_id) & (recieved_infl_req.inf_id == infl_id)).first()
+        
+        if check1 or check2:
             return jsonify({'message': 'Already Sent'}), 400
         
         
@@ -350,3 +377,88 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                 'status': req.status
             })
         return jsonify(reqs_json),200
+
+    @app.route('/delete_req_to_spons/<id>', methods=['DELETE'])
+    @auth_required('token')
+    def delete_to_spons(id):
+        target_req = recieved_infl_req.query.filter_by(id=id).first()
+        if not target_req:
+            return jsonify({"message": "No such request"}), 404
+        db.session.delete(target_req)
+        try:
+            db.session.commit()
+            return jsonify({"message": "req deleted"}),200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'delete failed', 'error': e}), 408
+        
+    @app.route('/delete_req_to_infl/<id>', methods=['DELETE'])
+    @auth_required('token')
+    def delete_to_infl(id):
+        target_req = recieved_ad_req.query.filter_by(id=id).first()
+        if not target_req:
+            return jsonify({"message": "No such request"}), 404
+        db.session.delete(target_req)
+        try:
+            db.session.commit()
+            return jsonify({"message": "req deleted"}),200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'delete failed', 'error': e}), 408
+
+
+    @app.route('/accept_req_to_spons/<id>', methods=['GET'])
+    @roles_accepted("spons")
+    def accept_to_spons(id):
+        target_req = recieved_infl_req.query.filter_by(id=id).first()
+        if not target_req:
+                return jsonify({"message": "No such request"}), 404
+        target_req.status='accepted'
+        try:
+            db.session.commit()
+            return jsonify({"message": "req accepted"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'accepting failed', 'error': e}), 408
+
+    @app.route('/reject_req_to_spons/<id>', methods=['GET'])
+    @roles_accepted("spons")
+    def reject_to_spons(id):
+        target_req = recieved_infl_req.query.filter_by(id=id).first()
+        if not target_req:
+                return jsonify({"message": "No such request"}), 404
+        target_req.status='rejected'
+        try:
+            db.session.commit()
+            return jsonify({"message": "req rejected"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'reject failed', 'error': e}), 408
+        
+    @app.route('/accept_req_to_infl/<id>', methods=['GET'])
+    @roles_accepted("infl")
+    def accept_to_infl(id):
+        target_req = recieved_ad_req.query.filter_by(id=id).first()
+        if not target_req:
+                return jsonify({"message": "No such request"}), 404
+        target_req.status='accepted'
+        try:
+            db.session.commit()
+            return jsonify({"message": "req accepted"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'accepting failed', 'error': e}), 408
+
+    @app.route('/reject_req_to_infl/<id>', methods=['GET'])
+    @roles_accepted("infl")
+    def reject_to_infl(id):
+        target_req = recieved_ad_req.query.filter_by(id=id).first()
+        if not target_req:
+                return jsonify({"message": "No such request"}), 404
+        target_req.status='rejected'
+        try:
+            db.session.commit()
+            return jsonify({"message": "req rejected"}), 200
+        except Exception as e:
+            db.session.rollback()
+            return jsonify({"message": 'reject failed', 'error': e}), 408

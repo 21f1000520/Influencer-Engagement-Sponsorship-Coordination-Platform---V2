@@ -19,7 +19,7 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
-        print(email,password)
+        # print(email,password)
         if not email or not password:
             return jsonify({'message': 'not valid email or password'}), 404
 

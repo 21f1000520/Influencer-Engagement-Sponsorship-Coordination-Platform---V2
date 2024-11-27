@@ -44,7 +44,7 @@ const AddCamp = {
                     </div>
                 
                     <div class="text-center mb-4" style="margin-top: 5%;">
-                    <button class="btn btn-primary" @click="go_to_dashboard">Go Back</button>
+                        <button class="btn btn-primary" @click="go_to_dashboard">Go Back</button>
                         <button class="btn btn-success" id="create" @click='Handle_Click'>Create</button>
                     </div>
         </div>

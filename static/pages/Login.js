@@ -15,11 +15,12 @@ const Login = {
         <div id = "loginError" class="form-group mb-4"  v-if="this.wrongPass"> Wrong Password </div>
         <div id = "loginError" class="form-group mb-4"  v-if="this.notActive"> User must be activated first by the Admin </div>
 
-        <button class="btn btn-primary w-100" @click="submitInfo">Submit</button>
-        <div class="block2">
-        <router-link to="/register">Register</router-link>
+        <button class="btn btn-primary w-100" @click="submitInfo">Log In</button>
+       
+        <router-link to="/register"><button type="button" class="btn btn-success w-100 shadow">Register</button></router-link>
+        
         </div>
-      </div>
+       
     </div>
   `,
   data() {

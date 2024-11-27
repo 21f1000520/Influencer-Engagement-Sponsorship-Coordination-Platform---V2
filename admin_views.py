@@ -5,7 +5,7 @@ from extentions import db
 from helper_functions import get_or_create, get_or_create_features
 import datetime
 
-from models import influencer_features, sponsor_features
+from models import influencer_features, sponsor_features,campaigns
 
 def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
     @app.route('/users/<role>',methods=['GET'])
@@ -173,3 +173,20 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
             print('error while deleting')
             db.session.rollback()
             return jsonify({'message': 'error while deleting user'}), 408
+
+    @app.route('/switch-flag-camp/<id>')
+    @roles_required('admin')
+    def flag_camp(id):
+        target = campaigns.query.filter_by(id=id).first()
+        if not target:
+            return jsonify({'message':'no such campaign'})
+        
+        target.flag = not target.flag
+        try:
+            db.session.commit()
+            # print('wrror')
+            return jsonify({'message': ' flag is switched', "campaign": target.name, 'flag': target.flag}), 200
+        except Exception as e:
+            print('error while flag switch',e)
+            db.session.rollback()
+            return jsonify({'message': 'error while flag switching campaign'}), 408

@@ -10,8 +10,8 @@ import DashboardAdmin from "../pages/DashboardAdmin.js";
 import UpdateUser from "../components/UpdateUser.js";
 import AddCamp from "../components/AddCampaign.js";
 
-
 import store from "./store.js";
+import Stats from "../pages/Stats.js";
 
 
 const routes = [
@@ -43,14 +43,17 @@ const routes = [
   {
     path: "/update-user",
     component: UpdateUser,
-    meta: { requiresLogin: true, role: "infl" },
+    meta: { requiresLogin: true },
   },
   {
     path: "/add_campaign",
     component: AddCamp,
     meta: { requiresLogin: true, role: "spons" },
   },
-//   { path: "/profile", component: Profile, meta: { loggedIn: true } },
+  { path: "/stats", 
+    name: "stats",
+    component: Stats, 
+    meta: { loggedIn: true } },
 ];
 
 const router = new VueRouter({

@@ -53,7 +53,10 @@ const UpdateUser = {
           <div v-if="this.industry.length===0" id="plateform_validation">Enter Industry</div>
         </div>
 
-        <button class="btn btn-primary w-100" @click="click_submit">Submit</button>
+        <div class="text-center mb-4" style="margin-top: 5%;">
+          <button class="btn btn-info" @click="go_to_dashboard">Go Back</button>
+          <button class="btn btn-primary " @click="click_submit">Submit</button>
+        </div>
       </div>
     </div>
   `,
@@ -121,7 +124,19 @@ const UpdateUser = {
         }
     },
     
-    methods: {
+    methods: {  
+            
+      go_to_dashboard(){
+            switch (this.$store.getters.getRole) {
+                case "spons":
+                    this.$router.push("/dashboard-spons");
+                    break;
+                case "infl":
+                    this.$router.push("/dashboard-infl");
+                }
+        },
+
+
         check_form(){
             if (this.role==='infl'){
                 console.log(this.platforms.length)

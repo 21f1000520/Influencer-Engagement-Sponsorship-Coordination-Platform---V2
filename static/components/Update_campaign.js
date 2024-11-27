@@ -120,7 +120,7 @@ const UpdateCamp = {
         },
         
         async Update_campaign(){
-            this.$emit('ClosePopup')
+            
             console.log(this.name)
             console.log(this.description)
             console.log(this.startDate)
@@ -151,7 +151,8 @@ const UpdateCamp = {
                 // this.all_influencers = datas;
                 console.log('updated')
                 console.log(datas);
-                this.$router.go()
+                this.$emit('reload_camps_data')
+                this.$emit('ClosePopup')
                 
                 
             }else {
