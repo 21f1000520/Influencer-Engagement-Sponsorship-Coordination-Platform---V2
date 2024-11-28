@@ -44,8 +44,8 @@ const AddCamp = {
                     </div>
                 
                     <div class="text-center mb-4" style="margin-top: 5%;">
-                        <button class="btn btn-primary" @click="go_to_dashboard">Go Back</button>
-                        <button class="btn btn-success" id="create" @click='Handle_Click'>Create</button>
+                        <button class="btn btn-success w-100" id="create" @click='Handle_Click'>Create</button>
+                        <button class="btn btn-primary btn-sm" @click="go_to_dashboard">Go Back</button>
                     </div>
         </div>
     </div>
@@ -91,7 +91,21 @@ const AddCamp = {
             }else if (this.goal.length===0){
                 alert('Must Enter a goal')
             }else{
-                this.Create_Campaign();
+                let currentDate = new Date();
+                let inputStart = new Date(this.startDate);
+                let inputEnd = new Date(this.endDate);
+                console.log(inputEnd,inputStart)
+                if (inputEnd<currentDate){
+                    alert('Cant enter the end date in the past!!')
+
+                }
+                else if (inputEnd<inputStart){
+                    alert('End date in the past of start date')
+                }
+                else{
+                    this.Create_Campaign();
+
+                }
             }
         },
 
@@ -140,6 +154,8 @@ const AddCamp = {
         } else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
           const errorData = await res.json();

@@ -21,7 +21,10 @@ const camp_dashboard={
                     <td> {{ influencer.fname }} </td>
                     <td> {{ influencer.lname }} </td>
                     <td>
-                    <p v-for="(plt,index2) in influencer.plateforms"> {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
+                    <p v-for="(plt,index2) in influencer.plateforms"> <i v-if="plt==='Instagram'" class="bi bi-instagram"></i> 
+                                    <i v-if="plt==='Youtube'" class="bi bi-youtube"></i>
+                                    <i v-if="plt==='Twitter'" class="bi bi-twitter-x"></i>
+                                    {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
                     </td>
                     <td> {{ influencer.email }} </td>
                     <td> 
@@ -52,19 +55,22 @@ const camp_dashboard={
                     <td> {{ influencer.fname }} </td>
                     <td> {{ influencer.lname }} </td>
                     <td>
-                    <p v-for="(plt,index2) in influencer.plateforms"> {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
+                    <p v-for="(plt,index2) in influencer.plateforms"> <i v-if="plt==='Instagram'" class="bi bi-instagram"></i> 
+                                    <i v-if="plt==='Youtube'" class="bi bi-youtube"></i>
+                                    <i v-if="plt==='Twitter'" class="bi bi-twitter-x"></i>
+                                    {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
                     </td>
                     <td> {{ influencer.email }} </td>
                     <td v-if="influencer.status==='pending'"> 
                         <span class="badge bg-secondary">Request Sent (Pending)</span> 
-                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" >Delete Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
                     <td v-if="influencer.status==='accepted'"> <span class="badge bg-success">Request Accepted</span> </td>
                     <td v-if="influencer.status==='rejected'"> 
                         <span class="badge bg-danger">Request Rejected</span> 
-                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" >Delete Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
 
                 </tr>
@@ -90,7 +96,10 @@ const camp_dashboard={
                     <td> {{ influencer.fname }} </td>
                     <td> {{ influencer.lname }} </td>
                     <td>
-                    <p v-for="(plt,index2) in influencer.plateforms"> {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
+                    <p v-for="(plt,index2) in influencer.plateforms"> <i v-if="plt==='Instagram'" class="bi bi-instagram"></i> 
+                                    <i v-if="plt==='Youtube'" class="bi bi-youtube"></i>
+                                    <i v-if="plt==='Twitter'" class="bi bi-twitter-x"></i>
+                                    {{ plt }} <span v-if="index2 != Object.keys(influencer.plateforms).length - 1">, </span> </p>
                     </td>
                     <td> {{ influencer.email }} </td>
 
@@ -106,8 +115,8 @@ const camp_dashboard={
 
                     <td v-if="influencer.status==='rejected'"> 
                         <span class="badge bg-danger">Request Rejected</span> 
-                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(influencer.req_id)" >Delete Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
 
                 </tr>
@@ -217,6 +226,8 @@ const camp_dashboard={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -244,6 +255,8 @@ const camp_dashboard={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -270,6 +283,8 @@ const camp_dashboard={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -296,6 +311,8 @@ const camp_dashboard={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -326,6 +343,8 @@ const camp_dashboard={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();

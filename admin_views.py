@@ -5,47 +5,49 @@ from extentions import db
 from helper_functions import get_or_create, get_or_create_features
 import datetime
 
-from models import influencer_features, sponsor_features,campaigns
+from models import influencer_features, sponsor_features, campaigns, recieved_ad_req, recieved_infl_req
+
 
 def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
-    @app.route('/users/<role>',methods=['GET'])
-    @roles_accepted('admin','spons')
+    @app.route('/users/<role>', methods=['GET'])
+    @roles_accepted('admin', 'spons')
     def get_influencers(role):
         print(role)
         all_users = user_datastore.user_model().query.all()
-        filtered_users=[]
-        if role=='infl':
+        filtered_users = []
+        if role == 'infl':
             for user in all_users:
                 if role in user.roles:
-                        InF = db.session.query(
-                            influencer_features).filter_by(user_id=user.id).first()
-                        # print(InF.plateforms)
-                        pltnames = [p.name for p in InF.plateforms]
-                        data = {'id': user.id,
-                                "fname":user.fname,
-                                "lname":user.lname,
-                                "plateforms":pltnames,
-                                "email":user.email,
-                                "flag": InF.flag, }
-                        filtered_users.append(data)
-        elif role=='spons':
+                    InF = db.session.query(
+                        influencer_features).filter_by(user_id=user.id).first()
+                    # print(InF.plateforms)
+                    pltnames = [p.name for p in InF.plateforms]
+                    data = {'id': user.id,
+                            "fname": user.fname,
+                            "lname": user.lname,
+                            "plateforms": pltnames,
+                            "email": user.email,
+                            "flag": InF.flag, }
+                    filtered_users.append(data)
+        elif role == 'spons':
             for user in all_users:
                 if role in user.roles:
-                    SpF = sponsor_features.query.filter_by(user_id=user.id).first()
+                    SpF = sponsor_features.query.filter_by(
+                        user_id=user.id).first()
                     data = {'id': user.id,
                             "fname": user.fname,
                             "lname": user.lname,
                             "industry": SpF.industry,
-                            "flag":SpF.flag,
+                            "flag": SpF.flag,
                             "email": user.email,
-                            "active":user.active}
+                            "active": user.active}
                     filtered_users.append(data)
         print(filtered_users)
 
         if not filtered_users:
-             return jsonify({'message':'no user found'}),404
-        return jsonify(filtered_users),200
-    
+            return jsonify({'message': 'no user found'}), 404
+        return jsonify(filtered_users), 200
+
     @app.route('/inactive_sponsors', methods=['GET'])
     @roles_required('admin')
     def get_inactive_sponsors():
@@ -123,7 +125,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({'message': 'user not present'}), 404
 
         role = user.roles[0].name
-        if role=='infl':
+        if role == 'infl':
             InF = db.session.query(
                 influencer_features).filter_by(user_id=user.id).first()
             InF.flag = not InF.flag
@@ -134,21 +136,20 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
                 print('error while flag switch')
                 db.session.rollback()
                 return jsonify({'message': 'error while flag switching user'}), 408
-        elif role=='spons':
+        elif role == 'spons':
             SpF = sponsor_features.query.filter_by(user_id=user.id).first()
             SpF.flag = not SpF.flag
-            print(SpF.flag,SpF.industry)
+            print(SpF.flag, SpF.industry)
             try:
                 db.session.commit()
                 # print('wrror')
                 return jsonify({'message': role+' flag is switched', "user": user.fname, 'flag': SpF.flag}), 200
             except Exception as e:
-                print('error while flag switch',e)
+                print('error while flag switch', e)
                 db.session.rollback()
                 return jsonify({'message': 'error while flag switching user'}), 408
 
-        return jsonify({'role':role,"user":user.fname}),408
-
+        return jsonify({'role': role, "user": user.fname}), 408
 
     @app.route('/delete_user/<id>', methods=['DELETE'])
     @roles_required('admin')
@@ -156,17 +157,42 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
         user = user_datastore.find_user(id=id)
         role = user.roles[0].name
         try:
-            db.session.delete(user)
             if role == 'infl':
                 InF = db.session.query(
                     influencer_features).filter_by(user_id=user.id).first()
                 print(InF.plateforms, InF.aboutMe)
+                running_to_infl = recieved_ad_req.query.filter_by(
+                    infl_id=id).all()
+                running_to_spons = recieved_infl_req.query.filter_by(
+                    inf_id=id).all()
+                if running_to_infl:
+                    print('found running to infl')
+                    for record in running_to_infl:
+                        db.session.delete(record)
+                if running_to_spons:
+                    print('found running to spons')
+                    for record in running_to_spons:
+                        db.session.delete(record)
                 db.session.delete(InF)
+
             elif role == 'spons':
                 SpF = db.session.query(
                     sponsor_features).filter_by(user_id=user.id).first()
                 print(SpF.industry)
+                running_to_infl = recieved_ad_req.query.filter_by(
+                    s_id=id).all()
+                running_to_spons = recieved_infl_req.query.filter_by(
+                    s_id=id).all()
+                if running_to_infl:
+                    print('found running to infl')
+                    for record in running_to_infl:
+                        db.session.delete(record)
+                if running_to_spons:
+                    print('found running to spons')
+                    for record in running_to_spons:
+                        db.session.delete(record)
                 db.session.delete(SpF)
+            db.session.delete(user)
             db.session.commit()
             return jsonify({'message': 'User Deleted', "user": user.fname, 'role': role}), 200
         except:
@@ -179,14 +205,14 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
     def flag_camp(id):
         target = campaigns.query.filter_by(id=id).first()
         if not target:
-            return jsonify({'message':'no such campaign'})
-        
+            return jsonify({'message': 'no such campaign'})
+
         target.flag = not target.flag
         try:
             db.session.commit()
             # print('wrror')
             return jsonify({'message': ' flag is switched', "campaign": target.name, 'flag': target.flag}), 200
         except Exception as e:
-            print('error while flag switch',e)
+            print('error while flag switch', e)
             db.session.rollback()
             return jsonify({'message': 'error while flag switching campaign'}), 408

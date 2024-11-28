@@ -8,10 +8,14 @@ const Stats = {
                                     <th scope="col">#</th>
                                     <th scope="col">Name</th>
                                     <th scope="col">Details</th>
-                                    <th scope="col">Payment (Rs.)</th>
+                                    <th scope="col">Budget &#x20b9</th>
                                     <th scope="col" v-if="all_running[0].current_user_role!=='infl'">Influecer</th>
                                     <th scope="col" v-if="all_running[0].current_user_role!=='spons'">Sponsor</th>
-                                    <th scope="col">Actions</th>
+                                    <th scope="col">Progress (%)</th>
+                                    <th scope="col" v-if="all_running[0].current_user_role==='infl'">Recieved Money &#x20b9</th>
+                                    <th scope="col" v-if="all_running[0].current_user_role==='spons'">Paid Money &#x20b9</th>
+                                    
+                                   
                                 </tr>
                             </thead>
                             <tbody>
@@ -23,20 +27,21 @@ const Stats = {
                                     <td v-if="!Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Campaign.budget }}</td>
                                     <td v-if="Campaign.current_user_role!=='infl' && !Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Campaign.influencer_name }}</td>
                                     <td v-if="Campaign.current_user_role!=='spons' && !Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Campaign.sponsor_name }}</td>
-                                    <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role!=='admin' " colspan="3" class="h6"  > Flagged By Admin!!! </td>
-                                    <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role==='admin' " colspan="4" class="h6"  > Flagged By Admin!!! </td>
-                                    <td>
-                                        <button v-if="!Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag" type="button" class="btn btn-danger" >Button</button>
-                                        <button v-if="Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag" type="button" class="btn btn-danger" disabled>Button</button>
-                                    </td>   
-                                    
-                                 
+                                    <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role!=='admin' " colspan="5" class="h6"  > Flagged By Admin!!! </td>
+                                    <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role==='admin' " colspan="5" class="h6"  > Flagged By Admin!!! </td>
+                                    <td v-if="!Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag"> {{Math.round(progress[index]*100)/100}} </td>
+                                    <td v-if="Campaign.current_user_role!=='admin' && !Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Math.round(payment[index]) }}</td>
                                 </tr>
 
                             </tbody>
+                            <tfoot class="table-success">
+                                <td colspan="5" class="h6" v-if="all_running[0].current_user_role!=='admin'"></td>
+                                <td class="h6" v-if="all_running[0].current_user_role!=='admin'">Total Paid = </td>
+                                <td class="h6 " v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
+                            </tfoot>
                         </table>   
                        
-                        <div  class="chart-container">
+                        <div v-show="this.progress.length>0" class="chart-container">
                             <canvas id="myChart"></canvas>
                         </div>
                     </div>
@@ -48,6 +53,7 @@ const Stats = {
             all_running:[],
             progress:[],
             labels:[],
+            payment:[],
         }
     },
 
@@ -65,7 +71,7 @@ const Stats = {
 
     mounted(){
         console.log('mounted')
-         
+        
     },
 
 
@@ -74,8 +80,12 @@ const Stats = {
         Get_plot_data(){
             let prg=[]
             let lb=[]
+            let pay=[]
             for (let i=0;i<this.all_running.length;i++){
                 let camp=this.all_running[i]
+                if (camp.flag || camp.influencer_flag || camp.sponsor_flag){
+                    continue;
+                }
                 // console.log(camp.start_date,camp.end_date);
                 let start =  new Date(camp.start_date);
                 let end =  new Date(camp.end_date);
@@ -84,11 +94,20 @@ const Stats = {
                 let spent = ms_now-start.getTime()
                 let frac = spent/length*100
                 // console.log(frac,camp.name)
-                prg.push(frac)
+                if (frac>=100){
+                    pay.push(camp.budget)
+                    prg.push(100)
+                }else{
+                    pay.push(camp.budget*Math.floor(frac/10)/10)
+                    // console.log(camp.budget*Math.floor(frac/10)/10)
+                    prg.push(frac)
+                }
                 lb.push(camp.name)
             };
             this.progress=prg
             this.labels=lb
+
+            this.payment=pay
             // console.log('progress',prg,lb)
             console.log('progress',this.progress)
         },
@@ -113,6 +132,9 @@ const Stats = {
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
+                
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -146,10 +168,12 @@ const Stats = {
                                     title:{
                                         display:true,
                                         text:'Progress'
-                                    }
+                                    },
+                                    max:100,
                                 
                                 }
                             },
+                        // barThickness: 100,
                         plugins:{
                             title:{
                                 display:true,

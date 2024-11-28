@@ -33,6 +33,9 @@ const DashboardInfl = {
                                 <li class="list-group-item h5 bg-transparent"> {{this.user_data.email}} </li>
                                 <li class="list-group-item h5 bg-transparent" v-if="this.user_data.role==='infl'">
                                   <span class="badge bg-secondary h5" style="margin-left:5%;" v-for="(plt,index2) in this.user_data.plateforms"> 
+                                    <i v-if="plt==='Instagram'" class="bi bi-instagram"></i> 
+                                    <i v-if="plt==='Youtube'" class="bi bi-youtube"></i>
+                                    <i v-if="plt==='Twitter'" class="bi bi-twitter-x"></i>
                                     {{ plt }}
                                   </span>
                                 </li>
@@ -50,7 +53,7 @@ const DashboardInfl = {
                   
                   <div class="row d-flex justify-content-center">
                     <div class="col-12  justify-content-center" style="text-align: center;">
-                      <button type="button" class="btn btn-danger w-50" @click="view_all_camps" style="border-radius: 26px;">View Campaigns</button>
+                      <button type="button" class="btn w-50" :class="{'btn-danger':!showCamps,'btn-success':showCamps}" @click="view_all_camps" style="border-radius: 26px;">View Campaigns</button>
                     
                       <show_campaigns v-if="this.showCamps" :all_camps="all_camps" 
                       :req_to_inf="req_to_inf" :req_to_spons="req_to_spons" :id="user_data.id"
@@ -105,6 +108,8 @@ const DashboardInfl = {
         }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
             sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
       }else {
       const errorData = await res.json();
@@ -137,6 +142,8 @@ const DashboardInfl = {
         }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
             sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
       }else {
         const errorData = await res.json();
@@ -185,6 +192,8 @@ const DashboardInfl = {
         }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
             sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
       }else {
         const errorData = await res.json();
@@ -252,6 +261,8 @@ const DashboardInfl = {
     }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
             sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
       }else {
       const errorData = await res.json();

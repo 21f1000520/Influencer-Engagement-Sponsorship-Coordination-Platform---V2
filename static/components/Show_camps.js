@@ -2,7 +2,7 @@
 
 const show_campaigns={
     template:`
-    <div>
+    <div id="scrollToMe">
     <table class="table table-hover table-striped caption-top" v-if="untouched_camps.length>0">
     <caption v-if="untouched_camps.length>0"><h1 class="display-5">Available Campaigns</h1></caption>
             <thead class="table-primary">
@@ -67,8 +67,8 @@ const show_campaigns={
 
                     <td v-if="Campaign.status==='rejected'"> 
                         <span class="badge bg-danger">Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(Campaign.req_id)" >Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
                     
                     
@@ -100,16 +100,16 @@ const show_campaigns={
                     <td>{{ Campaign.sponsor_name }}</td>
                     <td v-if="Campaign.status==='pending'"> 
                         <span class="badge bg-primary">Request Sent (Pending)</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" >Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
 
                     <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success">Request Accepted</span> </td>
 
                     <td v-if="Campaign.status==='rejected'"> 
                         <span class="badge bg-danger">Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" >Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled >Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
                     
                 </tr>
@@ -213,8 +213,32 @@ const show_campaigns={
 
     },
 
+    mounted() {
+        console.log('mounted view camps')
+        this.scrollToElement();
+
+    },
+    
+    beforeUnmount(){
+        console.log('unmounted')
+    },
+
 
     methods:{
+        scrollToElement() {
+            // const el = this.$refs.scrollToMe;
+            const el = document.getElementById("scrollToMe");
+
+            if (el) {
+                console.log('found scroll')
+                // Use el.scrollIntoView() to instantly scroll to the element
+                // el.scrollIntoView({behavior: 'smooth'});
+                setTimeout(function () {
+                            el.scrollIntoView({behavior: 'smooth',
+                                                block: "start",});
+                            }, 100);
+            }
+        },
         async Delete_sent_to_infl(id){
             console.log('delete',id)
             const origin = window.location.origin;
@@ -235,6 +259,8 @@ const show_campaigns={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -262,6 +288,8 @@ const show_campaigns={
             }else if(res.status===403 || res.status===401){
                     console.error("Forbidden Request");
                     sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                     this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -289,6 +317,8 @@ const show_campaigns={
             }else if(res.status===403 || res.status===401){
                     console.error("Forbidden Request");
                     sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                     this.$router.push("/login");
              }else {
                 const errorData = await res.json();
@@ -316,6 +346,8 @@ const show_campaigns={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();
@@ -346,6 +378,8 @@ const show_campaigns={
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
             }else {
                 const errorData = await res.json();

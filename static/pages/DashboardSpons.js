@@ -14,8 +14,8 @@ const DashboardSpons = {
                     </div>
                     <div v-else> 
                     <campaign :camps=this.campaigns @blurr="Blurr_back" @reload_campaigns="Reload_camps" style="text-align: center;"/>
-                    <button type="button" class="btn btn-success shadow-lg" @click="Add_Campaign" style="border-radius: 26px;">Add Campaign</button>
-                    <router-link to="/update-user"><button type="button" class="btn btn-primary bt-custom-dashboard shadow-lg" style="border-radius: 26px;">Update Profile</button></router-link>
+                    <button type="button" class="btn btn-success shadow-lg" @click="Add_Campaign" style="border-radius: 26px;"><i class="bi bi-cloud-arrow-up"></i> Add Campaign</button>
+                    <router-link to="/update-user"><button type="button" class="btn btn-primary bt-custom-dashboard shadow-lg" style="border-radius: 26px;"><i class="bi bi-cloud-arrow-up"></i> Update Profile</button></router-link>
                     </div>
                 </div>
             </div>
@@ -51,12 +51,16 @@ const DashboardSpons = {
             console.log(this.user_data,'user data')
         }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
-            sessionStorage.clear()
+                sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
       }else {
         let errorData = await res.json();
         console.error("No current user:", errorData);
-        sessionStorage.clear()
+                sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
         this.$router.push("/login");
         // this.$router.go();
         
@@ -101,6 +105,8 @@ const DashboardSpons = {
             }else if(res.status===403 || res.status===401){
                 console.error("Forbidden Request");
                 sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 }else {
                 let errorData = await res.json();

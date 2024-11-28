@@ -105,6 +105,8 @@ const UpdateUser = {
         }else if(res.status===403 || res.status===401){
             console.error("Forbidden Request");
             sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
             this.$router.push("/login");
         }else {
             const errorData = await res.json();
@@ -228,6 +230,8 @@ const UpdateUser = {
                 }else if(res.status===403 || res.status===401){
                       console.error("Forbidden Request");
                       sessionStorage.clear()
+                this.$store.commit("logout");
+                this.$store.commit("setRole", null);
                       this.$router.push("/login");
                 }else {
                 const errorData = await res.json();

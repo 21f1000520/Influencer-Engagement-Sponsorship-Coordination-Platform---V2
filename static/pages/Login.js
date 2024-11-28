@@ -58,7 +58,7 @@ const Login = {
         // add data to vuex
         this.$store.commit("setRole", data.role);
         this.$store.commit("setLogin", true);
-        setTimeout(function() { sessionStorage.clear(); }, (10 * 60 * 1000));
+        setTimeout(function() { sessionStorage.clear(); }, (30*60 * 1000));
         switch (data.role) {
           case "spons":
             this.$router.push("/dashboard-spons");
