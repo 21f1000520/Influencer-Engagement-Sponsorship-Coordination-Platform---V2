@@ -1,12 +1,12 @@
 from flask import jsonify, render_template, render_template_string, request, send_file
 from flask_security import auth_required, current_user, roles_required, roles_accepted, SQLAlchemyUserDatastore
 from flask_security.utils import hash_password, verify_password
-from extentions import db
+from extentions import db, cache
 from helper_functions import get_or_create, get_or_create_features
 from datetime import datetime
 import os
-from models import influencer_features, sponsor_features,platforms,campaigns
-from models import recieved_infl_req,recieved_ad_req
+from models import influencer_features, sponsor_features, platforms, campaigns
+from models import recieved_infl_req, recieved_ad_req
 
 
 def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
@@ -19,7 +19,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         if role == 'spons':
             SpF = db.session.query(
                 sponsor_features).filter_by(user_id=current_user.id).first()
-            
+
             data = {'id': current_user.id,
                     "fname": current_user.fname,
                     "lname": current_user.lname,
@@ -27,11 +27,10 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                     "flag": SpF.flag,
                     "email": current_user.email,
                     "active": current_user.active,
-                    "role":role,
-                    'dp_name':SpF.dp_name}
+                    "role": role,
+                    'dp_name': SpF.dp_name}
             return jsonify(data)
 
-            
         elif role == 'infl':
             InF = db.session.query(
                 influencer_features).filter_by(user_id=current_user.id).first()
@@ -42,8 +41,8 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                     "plateforms": pltnames,
                     "email": current_user.email,
                     "flag": InF.flag,
-                    "role":role,
-                    "aboutMe":InF.aboutMe,
+                    "role": role,
+                    "aboutMe": InF.aboutMe,
                     'dp_name': InF.dp_name}
             return jsonify(data)
 
@@ -54,18 +53,18 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         if 'file' not in request.files:
             print('No file part')
             return jsonify({'message': 'no file selected'}), 400
-        
+
         InF = db.session.query(
             influencer_features).filter_by(user_id=current_user.id).first()
         # print(request.form)
         file = request.files['file']
         filename = request.form['name']
-        InF.dp_name=filename
+        InF.dp_name = filename
         db.session.commit()
         if file:
-            print(file,filename)
+            print(file, filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return jsonify({'message':'uploaded'}),200
+        return jsonify({'message': 'uploaded'}), 200
 
     @app.route('/update_user', methods=['PUT'])
     @auth_required('token')
@@ -117,20 +116,20 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             print('error while updating')
             db.session.rollback()
             return jsonify({'message': 'error while updating user'}), 408
-    
+
     @app.route('/add_campaign', methods=['POST'])
     @roles_required("spons")
     def add_campaign():
         print(current_user)
         data = request.get_json()
-        name= data.get("name")
+        name = data.get("name")
         description = data.get("description")
         startDate = datetime.strptime(data.get("startDate"), '%Y-%m-%d')
         endDate = datetime.strptime(data.get("endDate"), '%Y-%m-%d')
         budget = data.get("budget")
         goal = data.get("goal")
         visibility = data.get("visibility")
-        
+
         camp_new = campaigns(name=name, description=description,
                              start_date=startDate, end_date=endDate,
                              budget=budget, goals=goal, visibility=visibility, s_id=current_user.id)
@@ -140,28 +139,28 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         SpF.campaigns.append(camp_new)
         try:
             db.session.commit()
-            return jsonify({"data":data,"message":'Campaign added successfully'}),200
+            return jsonify({"data": data, "message": 'Campaign added successfully'}), 200
         except Exception:
             db.session.rollback()
             return jsonify({"data": data, "message": 'Campaign addition failed'}), 408
 
     @app.route('/get_campaigns', methods=['GET'])
     @roles_required("spons")
+    @cache.cached(timeout=20)
     def get_campaigns():
         SpF = db.session.query(
             sponsor_features).filter_by(user_id=current_user.id).first()
         camps = SpF.campaigns
         if not camps:
-            return jsonify({'message':'No campaigns found'}),404
-        
-        camp_array=[]
+            return jsonify({'message': 'No campaigns found'}), 404
+
+        camp_array = []
         for camp in camps:
-            camp_array.append({'name':camp.name,'description':camp.description,
+            camp_array.append({'name': camp.name, 'description': camp.description,
                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
-                               'flag':camp.flag,'id':camp.id})
+                               'flag': camp.flag, 'id': camp.id})
         return jsonify(camp_array)
-    
 
     @app.route('/delete_campaigns/<id>', methods=['DELETE'])
     @roles_required("spons")
@@ -170,10 +169,11 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             sponsor_features).filter_by(user_id=current_user.id).first()
         camp_del = campaigns.query.filter(
             (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
-        
+
         sent_req_to_infl = recieved_ad_req.query.filter_by(
-            campaign_id = id).first()
-        sent_req_to_spons = recieved_infl_req.query.filter_by(camp_id=id).first()
+            campaign_id=id).first()
+        sent_req_to_spons = recieved_infl_req.query.filter_by(
+            camp_id=id).first()
         # camps = SpF.campaigns
         # if not camps:
         #     return jsonify({'message':'No campaigns found'}),404
@@ -186,11 +186,11 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             db.session.delete(sent_req_to_spons)
         try:
             db.session.commit()
-            return jsonify({'camp deleted ':camp_del.name}),200
+            return jsonify({'camp deleted ': camp_del.name}), 200
         except Exception:
             db.session.rollback()
             return jsonify({"message": 'Could not delete'}), 408
-        
+
     @app.route('/update_campaigns/<id>', methods=['PUT'])
     @roles_required("spons")
     def update_campaigns(id):
@@ -199,18 +199,16 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         current_camp = campaigns.query.filter(
             (campaigns.id == id) & (campaigns.s_id == current_user.id)).first()
 
-
-
         if not current_camp:
             return jsonify({'message': 'No such campaign with this id'}), 404
-        
+
         data = request.get_json()
         name = data.get("name")
         description = data.get("description")
-        startDate=""
+        startDate = ""
         if data.get("startDate"):
             startDate = datetime.strptime(data.get("startDate"), '%Y-%m-%d')
-        endDate=""
+        endDate = ""
         if data.get("endDate"):
             endDate = datetime.strptime(data.get("endDate"), '%Y-%m-%d')
         budget = data.get("budget")
@@ -218,7 +216,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         visibility = data.get("visibility")
         # return jsonify(data)
         if name:
-            current_camp.name=name
+            current_camp.name = name
         if description:
             current_camp.description = description
         if startDate:
@@ -242,7 +240,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             print('error while updating')
             db.session.rollback()
             return jsonify({'message': 'error while updating campaign'}), 408
-        
+
     @app.route('/get_campaign/<id>', methods=['GET'])
     @roles_required("spons")
     def get_campaign(id):
@@ -253,10 +251,10 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         return jsonify({'name': camp.name, 'description': camp.description,
                         'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
                         'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
-                               'flag': camp.flag,'id':camp.id})
-    
+                        'flag': camp.flag, 'id': camp.id})
+
     @app.route('/get_all_campaigns', methods=['GET'])
-    @roles_accepted("admin","infl")
+    @roles_accepted("admin", "infl")
     def get_all_campaign():
         camps = campaigns.query.all()
         camp_array = []
@@ -265,12 +263,12 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             sname = sponsor.fname+' '+sponsor.lname
             if camp.visibility and current_user.roles[0].name == 'infl':
                 camp_array.append({'name': camp.name, 'description': camp.description,
-                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
-                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
-                                'flag': camp.flag, 'id': camp.id,'sponsor_id':camp.s_id,'sponsor_name':sname})
+                                   'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                   'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                   'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname})
             elif not camp.visibility and current_user.roles[0].name == 'infl':
                 invisible = recieved_ad_req.query.filter(
-                    (recieved_ad_req.infl_id == current_user.id) & (recieved_ad_req.campaign_id==camp.id)).first()
+                    (recieved_ad_req.infl_id == current_user.id) & (recieved_ad_req.campaign_id == camp.id)).first()
                 if invisible:
                     # print(invisible)
                     camp_array.append({'name': camp.name, 'description': camp.description,
@@ -279,20 +277,20 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                        'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname})
             if current_user.roles[0].name == 'admin':
                 camp_array.append({'name': camp.name, 'description': camp.description,
-                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
-                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
-                                'flag': camp.flag, 'id': camp.id,'sponsor_id':camp.s_id,'sponsor_name':sname})
+                                   'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                   'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                   'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname})
 
         # print(camp_array)
         return jsonify(camp_array)
-    
-    @app.route('/send_ad_req_to_spons/<c_id>',methods=['GET'])
+
+    @app.route('/send_ad_req_to_spons/<c_id>', methods=['GET'])
     @roles_accepted("infl")
     def send_req_to_spons(c_id):
 
         target_camp = campaigns.query.filter_by(id=c_id).first()
         if not target_camp:
-            return jsonify({'message':'No Such Campaign'}),404
+            return jsonify({'message': 'No Such Campaign'}), 404
         sponsor_id = target_camp.s_id
 
         check1 = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
@@ -301,36 +299,37 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             (recieved_infl_req.camp_id == c_id) & (recieved_infl_req.inf_id == current_user.id)).first()
 
         if check1 or check2:
-            return jsonify({'message':'Already Sent'}),400
+            return jsonify({'message': 'Already Sent'}), 400
 
-        req = recieved_infl_req(inf_id=current_user.id,s_id=sponsor_id,camp_id=c_id)
+        req = recieved_infl_req(inf_id=current_user.id,
+                                s_id=sponsor_id, camp_id=c_id)
         db.session.add(req)
         try:
             db.session.commit()
-            return jsonify({"message":"sent req to spons"})
+            return jsonify({"message": "sent req to spons"})
         except Exception as e:
             db.session.rollback()
-            return jsonify({"message": 'Could not send','error':e}), 408
+            return jsonify({"message": 'Could not send', 'error': e}), 408
 
     @app.route('/send_ad_req_to_infl/<c_id>/<infl_id>', methods=['GET'])
     @roles_accepted("spons")
-    def send_req_to_infl(c_id,infl_id):
+    def send_req_to_infl(c_id, infl_id):
         print(c_id, infl_id)
         InF = influencer_features.query.filter_by(user_id=infl_id).first()
 
         if not InF:
-            jsonify({"message":"no such influencer found"}),404
+            jsonify({"message": "no such influencer found"}), 404
 
         check1 = recieved_ad_req.query.filter((recieved_ad_req.campaign_id == c_id) & (
             recieved_ad_req.infl_id == infl_id)).first()
         check2 = recieved_infl_req.query.filter(
             (recieved_infl_req.camp_id == c_id) & (recieved_infl_req.inf_id == infl_id)).first()
-        
+
         if check1 or check2:
             return jsonify({'message': 'Already Sent'}), 400
-        
-        
-        req = recieved_ad_req(infl_id=infl_id,campaign_id=c_id,s_id=current_user.id)
+
+        req = recieved_ad_req(
+            infl_id=infl_id, campaign_id=c_id, s_id=current_user.id)
         req.influencer_features.append(InF)
         db.session.add(req)
         try:
@@ -341,25 +340,27 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({"message": 'Could not send', 'error': e}), 408
 
     @app.route('/get_all_req_to_inf', methods=['GET'])
+    @cache.cached(timeout=1)
     @auth_required('token')
     def get_all_req_infl():
         all_req = recieved_ad_req.query.all()
         if not all_req:
             jsonify({"message": "No req sent to influencers"}), 404
-        reqs_json=[]
+        reqs_json = []
         for req in all_req:
             InFs = req.influencer_features
             reqs_json.append({
-                'id':req.id,
-                'influencer_id':req.infl_id,
-                'campaign_id':req.campaign_id,
-                'sponsor_id':req.s_id,
-                'status':req.status,
-                'influencers':[inf.user_id for inf in InFs]
+                'id': req.id,
+                'influencer_id': req.infl_id,
+                'campaign_id': req.campaign_id,
+                'sponsor_id': req.s_id,
+                'status': req.status,
+                'influencers': [inf.user_id for inf in InFs]
             })
-        return jsonify(reqs_json),200
+        return jsonify(reqs_json), 200
 
     @app.route('/get_all_req_to_spons', methods=['GET'])
+    @cache.cached(timeout=1)
     @auth_required('token')
     def get_all_req_spons():
         all_req = recieved_infl_req.query.all()
@@ -374,7 +375,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                 'campaign_id': req.camp_id,
                 'status': req.status
             })
-        return jsonify(reqs_json),200
+        return jsonify(reqs_json), 200
 
     @app.route('/delete_req_to_spons/<id>', methods=['DELETE'])
     @auth_required('token')
@@ -385,11 +386,11 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         db.session.delete(target_req)
         try:
             db.session.commit()
-            return jsonify({"message": "req deleted"}),200
+            return jsonify({"message": "req deleted"}), 200
         except Exception as e:
             db.session.rollback()
             return jsonify({"message": 'delete failed', 'error': e}), 408
-        
+
     @app.route('/delete_req_to_infl/<id>', methods=['DELETE'])
     @auth_required('token')
     def delete_to_infl(id):
@@ -399,19 +400,18 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         db.session.delete(target_req)
         try:
             db.session.commit()
-            return jsonify({"message": "req deleted"}),200
+            return jsonify({"message": "req deleted"}), 200
         except Exception as e:
             db.session.rollback()
             return jsonify({"message": 'delete failed', 'error': e}), 408
-
 
     @app.route('/accept_req_to_spons/<id>', methods=['GET'])
     @roles_accepted("spons")
     def accept_to_spons(id):
         target_req = recieved_infl_req.query.filter_by(id=id).first()
         if not target_req:
-                return jsonify({"message": "No such request"}), 404
-        target_req.status='accepted'
+            return jsonify({"message": "No such request"}), 404
+        target_req.status = 'accepted'
         try:
             db.session.commit()
             return jsonify({"message": "req accepted"}), 200
@@ -424,22 +424,22 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
     def reject_to_spons(id):
         target_req = recieved_infl_req.query.filter_by(id=id).first()
         if not target_req:
-                return jsonify({"message": "No such request"}), 404
-        target_req.status='rejected'
+            return jsonify({"message": "No such request"}), 404
+        target_req.status = 'rejected'
         try:
             db.session.commit()
             return jsonify({"message": "req rejected"}), 200
         except Exception as e:
             db.session.rollback()
             return jsonify({"message": 'reject failed', 'error': e}), 408
-        
+
     @app.route('/accept_req_to_infl/<id>', methods=['GET'])
     @roles_accepted("infl")
     def accept_to_infl(id):
         target_req = recieved_ad_req.query.filter_by(id=id).first()
         if not target_req:
-                return jsonify({"message": "No such request"}), 404
-        target_req.status='accepted'
+            return jsonify({"message": "No such request"}), 404
+        target_req.status = 'accepted'
         try:
             db.session.commit()
             return jsonify({"message": "req accepted"}), 200
@@ -452,8 +452,8 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
     def reject_to_infl(id):
         target_req = recieved_ad_req.query.filter_by(id=id).first()
         if not target_req:
-                return jsonify({"message": "No such request"}), 404
-        target_req.status='rejected'
+            return jsonify({"message": "No such request"}), 404
+        target_req.status = 'rejected'
         try:
             db.session.commit()
             return jsonify({"message": "req rejected"}), 200
@@ -462,46 +462,47 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({"message": 'reject failed', 'error': e}), 408
 
     @app.route('/get_all_running', methods=['GET'])
+    @cache.cached(timeout=20)
     @auth_required('token')
     def get_all_running():
         role = current_user.roles[0].name
-        if role=='spons':
-            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.s_id==current_user.id) & 
-                                                           (recieved_ad_req.status=='accepted')).all()
+        if role == 'spons':
+            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.s_id == current_user.id) &
+                                                           (recieved_ad_req.status == 'accepted')).all()
             running_to_spons = recieved_infl_req.query.filter((recieved_infl_req.s_id == current_user.id) &
                                                               (recieved_infl_req.status == 'accepted')).all()
-        elif role=='infl':
-            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.infl_id==current_user.id) & 
+        elif role == 'infl':
+            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.infl_id == current_user.id) &
                                                            (recieved_ad_req.status == 'accepted')).all()
             running_to_spons = recieved_infl_req.query.filter((recieved_infl_req.inf_id == current_user.id) &
                                                               (recieved_infl_req.status == 'accepted')).all()
-        elif role=='admin':
+        elif role == 'admin':
             running_to_infl = recieved_ad_req.query.filter_by(
                 status='accepted').all()
             running_to_spons = recieved_infl_req.query.filter_by(
                 status='accepted').all()
-        
+
         if not running_to_infl and not running_to_spons:
-            return jsonify({'message':'nothing is runnign'}),404
+            return jsonify({'message': 'nothing is runnign'}), 404
 
         camp_array = []
         if running_to_infl:
             for r_to_i in running_to_infl:
                 camp = campaigns.query.filter_by(id=r_to_i.campaign_id).first()
                 sponsor = user_datastore.find_user(id=camp.s_id)
-                influencer =  user_datastore.find_user(id=r_to_i.infl_id)
+                influencer = user_datastore.find_user(id=r_to_i.infl_id)
                 sname = sponsor.fname+' '+sponsor.lname
                 inf_name = influencer.fname+' '+influencer.lname
                 InF = db.session.query(
                     influencer_features).filter_by(user_id=influencer.id).first()
                 SpF = db.session.query(
                     sponsor_features).filter_by(user_id=sponsor.id).first()
-                
+
                 camp_array.append({'name': camp.name, 'description': camp.description,
-                                'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
-                                'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
-                                'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
-                                'influencer_id':influencer.id,'influencer_name':inf_name,'sponsor_active':sponsor.active,
+                                   'start_date': str(camp.start_date.date()), 'end_date': str(camp.end_date.date()),
+                                   'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
+                                   'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
+                                   'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
                                    'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
         if running_to_spons:
             for r_to_s in running_to_spons:
@@ -521,4 +522,4 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                    'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
                                    'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
                                    'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
-        return jsonify(camp_array),200
+        return jsonify(camp_array), 200

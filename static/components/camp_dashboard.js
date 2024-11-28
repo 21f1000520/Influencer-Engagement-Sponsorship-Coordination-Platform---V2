@@ -3,6 +3,38 @@ const camp_dashboard={
     template:`
     <div class="popup" @click.self="$emit('ClosePopup')"> 
         <div class="popup-inner shadow-lg" style="max-width: 1920px; max-height: 100%;">
+
+            <form class="row g-3">
+                <div class="col-4">
+                    <input type="text" class="form-control" placeholder="Search Influencers by Name" v-model="Search_term_inf"  >
+                </div>
+                <div class="col-6">
+                    <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" id="Instagram" class="form-check-input" value="Instagram" v-model="platforms" />
+                        <label for="Instagram">Instagram</label>
+                    </div>
+                    <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" id="Twitter" class="form-check-input" value="Twitter" v-model="platforms" />
+                        <label for="Twitter">Twitter</label>
+                    </div>
+                    <div class="form-check form-switch form-check-inline">
+                        <input type="checkbox" id="Youtube" class="form-check-input" value="Youtube" v-model="platforms" />
+                        <label for="Youtube">Youtube</label>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <div class="input-group-btn">
+                        <button class="btn btn-secondary" @click="search_inf">
+                            <i class="bi bi-search"></i></i>
+                        </button>
+                    
+                        <button class="btn btn-secondary" @click="reload_inf">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
             <table class="table table-hover table-striped caption-top" v-if="untouched_influencer.length>0">
             <caption v-if="untouched_influencer.length>0"><h1 class="display-5">Available Influencers</h1></caption>
                 <thead>
@@ -28,8 +60,8 @@ const camp_dashboard={
                     </td>
                     <td> {{ influencer.email }} </td>
                     <td> 
-                        <button v-if="!influencer.flag" type="button" class="btn btn-primary" @click="Send_Req(influencer.id)" >Send Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-primary"  disabled>Send Request</button> 
+                        <button v-if="!influencer.flag" type="button" class="btn btn-primary" @click="Send_Req(influencer.id)" ><i class="bi bi-send"></i> Send Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-primary"  disabled><i class="bi bi-send"></i> Send Request</button> 
                     </td>
 
                 </tr>
@@ -38,7 +70,7 @@ const camp_dashboard={
 
             
             <table class="table table-hover table-striped caption-top" v-if="sent_influencers.length>0">
-            <caption v-if="sent_influencers.length>0"><h1 class="display-5">Sent Ad Requests</h1></caption>
+            <caption v-if="sent_influencers.length>0"><h1 class="display-5"><i class="bi bi-send-fill"></i> Sent Ad Requests</h1></caption>
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -62,13 +94,13 @@ const camp_dashboard={
                     </td>
                     <td> {{ influencer.email }} </td>
                     <td v-if="influencer.status==='pending'"> 
-                        <span class="badge bg-secondary">Request Sent (Pending)</span> 
+                        <span class="badge bg-secondary"><i class="bi bi-send-dash"></i> Request Sent (Pending)</span> 
                         <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
                         <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
-                    <td v-if="influencer.status==='accepted'"> <span class="badge bg-success">Request Accepted</span> </td>
+                    <td v-if="influencer.status==='accepted'"> <span class="badge bg-success"><i class="bi bi-envelope-check-fill"></i> Request Accepted</span> </td>
                     <td v-if="influencer.status==='rejected'"> 
-                        <span class="badge bg-danger">Request Rejected</span> 
+                        <span class="badge bg-danger"><i class="bi bi-send-x-fill"></i> Request Rejected</span> 
                         <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
                         <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
@@ -79,7 +111,7 @@ const camp_dashboard={
 
             
             <table class="table table-hover table-striped caption-top" v-if="recieved_influencers.length>0">
-            <caption v-if="recieved_influencers.length>0"><h1 class="display-5">Recieved Ad Requests</h1></caption>
+            <caption v-if="recieved_influencers.length>0"><h1 class="display-5"><i class="bi bi-envelope-arrow-down-fill"></i> Recieved Ad Requests</h1></caption>
                 <thead>
                     <tr>
                         <th scope="col">#</th>
@@ -104,17 +136,17 @@ const camp_dashboard={
                     <td> {{ influencer.email }} </td>
 
                     <td v-if="influencer.status==='pending'"> 
-                        <span class="badge bg-primary">Request Recieved (Pending)</span> 
-                        <button v-if="!influencer.flag" type="button" class="btn btn-success" @click="Accept_sent_to_spons(influencer.req_id)" >Accept Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-success"  disabled>Accept Request</button>
-                        <button v-if="!influencer.flag" type="button" class="btn btn-warning" @click="Reject_sent_to_spons(influencer.req_id)" >Reject Request</button> 
-                        <button v-if="influencer.flag" type="button" class="btn btn-warning" disabled >Reject Request</button>  
+                        <span class="badge bg-primary"><i class="bi bi-envelope-dash-fill"></i> Request Recieved (Pending)</span> 
+                        <button v-if="!influencer.flag" type="button" class="btn btn-success" @click="Accept_sent_to_spons(influencer.req_id)" ><i class="bi bi-envelope-check"></i> Accept Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-success"  disabled><i class="bi bi-envelope-check"></i> Accept Request</button>
+                        <button v-if="!influencer.flag" type="button" class="btn btn-warning" @click="Reject_sent_to_spons(influencer.req_id)" ><i class="bi bi-envelope-x"></i> Reject Request</button> 
+                        <button v-if="influencer.flag" type="button" class="btn btn-warning" disabled ><i class="bi bi-envelope-x"></i> Reject Request</button>  
                     </td>
 
-                    <td v-if="influencer.status==='accepted'"> <span class="badge bg-success">Request Accepted</span> </td>
+                    <td v-if="influencer.status==='accepted'"> <span class="badge bg-success"><i class="bi bi-envelope-check-fill"></i> Request Accepted</span> </td>
 
                     <td v-if="influencer.status==='rejected'"> 
-                        <span class="badge bg-danger">Request Rejected</span> 
+                        <span class="badge bg-danger"><i class="bi bi-envelope-x-fill"></i> Request Rejected</span> 
                         <button v-if="!influencer.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(influencer.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
                         <button v-if="influencer.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
@@ -122,7 +154,9 @@ const camp_dashboard={
                 </tr>
                 </tbody>
             </table>   
-
+            <div v-if="this.all_influencers.length===0" class="mt-5">
+                <h1 class="display-5 px-4 py-2 rounded-pill bg-warning" >No Influencers Found!!</h1>
+            </div>
         <button class="btn btn-secondary shadow-lg" style="border-radius: 120px;" @click="$emit('ClosePopup')">&#10060 Close</button>
         </div>
     </div>
@@ -142,6 +176,8 @@ const camp_dashboard={
         sent_influencers:[],
         recieved_influencers:[],
         running_req_inf:[],
+        Search_term_inf:"",
+        platforms:[],
         }
     },
 
@@ -206,6 +242,71 @@ const camp_dashboard={
     },
 
     methods:{
+        check_plats(array1,array2){
+            const found = array1.some(r=> array2.includes(r))
+            return found
+        },
+
+        search_inf(){
+            // console.log(this.Search_term_inf)
+            
+            if (this.Search_term_inf.length>0 && this.platforms.length===0){
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_inf, 'gi')
+                console.log(reg_search)
+                for (let element of this.all_influencers){
+                    console.log(element.fname,element.lname)
+                    if (element.fname.search(reg_search)>=0){
+                        console.log('found in first')
+                        new_array.push(element)
+                    }else if (element.lname.search(reg_search)>=0){
+                        console.log('found in last')
+                        new_array.push(element)
+                    }else{
+                        console.log("not found")
+                    }
+                }
+                this.all_influencers=new_array;
+
+            }else if (this.Search_term_inf.length>0 && this.platforms.length>0){
+                console.log('name and plateforms')
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_inf, 'gi')
+                for (let element of this.all_influencers){
+                    if (this.check_plats(element.plateforms,this.platforms)){
+                        if (element.fname.search(reg_search)>=0){
+                            console.log('found in first')
+                            new_array.push(element)
+                        }else if (element.lname.search(reg_search)>=0){
+                            console.log('found in last')
+                            new_array.push(element)
+                        }else{
+                            console.log("not found")
+                        }
+
+                    }
+                }
+                this.all_influencers=new_array;
+            }else if (this.Search_term_inf.length===0 && this.platforms.length>0){
+                console.log('only plateforms')
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_inf, 'gi')
+                for (let element of this.all_influencers){
+                    if (this.check_plats(element.plateforms,this.platforms)){
+                        new_array.push(element)
+
+                    }else{
+                        console.log('not found')
+                    }
+                }
+                this.all_influencers=new_array;
+            }
+        },
+        reload_inf(){
+            console.log('reload inf')
+            this.$emit('recal_all_inf')
+        },
+
         async Delete_sent_to_infl(id){
             console.log('delete',id)
             const origin = window.location.origin;

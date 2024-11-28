@@ -2,10 +2,11 @@ from flask import jsonify, render_template, render_template_string, request, sen
 from flask_security import auth_required, current_user, roles_required, roles_accepted, SQLAlchemyUserDatastore
 from flask_security.utils import hash_password, verify_password
 from extentions import db
-from helper_functions import get_or_create,get_or_create_features
+from helper_functions import get_or_create, get_or_create_features
 import datetime
 
-from models import platforms,influencer_features,sponsor_features
+from models import platforms, influencer_features, sponsor_features
+
 
 def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
 
@@ -15,7 +16,7 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
 
     @app.route('/user_login', methods=['POST'])
     def user_login():
-        
+
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')
@@ -36,7 +37,7 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
         if verify_password(password, user.password):
             return jsonify({'token': user.get_auth_token(), 'role': user.roles[0].name, 'id': user.id, 'email': user.email}), 200
         else:
-            return jsonify({'message': 'wrong password'}),404
+            return jsonify({'message': 'wrong password'}), 404
 
     @app.route('/register', methods=['POST'])
     def register():
@@ -48,7 +49,7 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
         password = data.get('password')
         role = data.get('role')
 
-        print(fname,lname,email,password,role)
+        print(fname, lname, email, password, role)
 
         if not email or not password or role not in ['spons', 'infl']:
             return jsonify({"message": "invalid input"})
@@ -66,25 +67,26 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
             platforms_dic = data.get('platforms')
             aboutMe = data.get('aboutMe')
             if platforms_dic:
-                plt_objs=[]
+                plt_objs = []
                 for plt in platforms_dic:
                     plt_obj = get_or_create(db.session, platforms, name=plt)
                     plt_objs.append(plt_obj)
-            
+
         try:
             user_datastore.create_user(fname=fname, lname=lname, email=email, password=hash_password(
                 password), roles=[role], active=active)
-            if role=='infl':
+            if role == 'infl':
                 influencer = user_datastore.find_user(
                     email=email)
                 print(influencer)
-                InF = get_or_create_features(db.session, influencer_features, plateforms=plt_objs, 
+                InF = get_or_create_features(db.session, influencer_features, plateforms=plt_objs,
                                              user_id=influencer.id, aboutMe=aboutMe)
-            elif role=='spons':
+            elif role == 'spons':
                 sponsor = user_datastore.find_user(
                     email=email)
                 print(sponsor)
-                SpF = get_or_create(db.session, sponsor_features, user_id=sponsor.id, industry=industry)
+                SpF = get_or_create(
+                    db.session, sponsor_features, user_id=sponsor.id, industry=industry)
             db.session.commit()
         except:
             print('error while creating')
@@ -92,6 +94,3 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({'message': 'error while creating user'}), 408
 
         return jsonify({'message': 'user created'}), 200
-
-    
-

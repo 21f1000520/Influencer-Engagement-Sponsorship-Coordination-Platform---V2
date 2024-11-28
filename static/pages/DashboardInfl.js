@@ -57,7 +57,7 @@ const DashboardInfl = {
                     
                       <show_campaigns v-if="this.showCamps" :all_camps="all_camps" 
                       :req_to_inf="req_to_inf" :req_to_spons="req_to_spons" :id="user_data.id"
-                      @recal_sent_spons="Get_all_sent_to_spons" @recal_sent_inf="Get_all_sent_to_infl" />
+                      @recal_sent_spons="Get_all_sent_to_spons" @recal_sent_inf="Get_all_sent_to_infl" @recal_all="Get_all_camps" />
                     </div>
                   </div>
                 </div>

@@ -37,7 +37,7 @@ const campaign={
 
         <div v-if="this.popup_view"> 
             <camp_dashboard :id="popup_updateId" :sent_reqs="sent_reqs" :recieved_reqs="recieved_reqs" :all_influencers="all_influencers"  
-                @ClosePopup="Close" @recal_sent_inf="Get_all_sent_to_infl" @recal_sent_spons="Get_all_sent_to_spons"/> 
+                @ClosePopup="Close" @recal_sent_inf="Get_all_sent_to_infl" @recal_sent_spons="Get_all_sent_to_spons" @recal_all_inf="Get_all_infls"/> 
         </div>
     </div>
     `,

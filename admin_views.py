@@ -1,7 +1,7 @@
 from flask import jsonify, render_template, render_template_string, request, send_file
 from flask_security import auth_required, current_user, roles_required, roles_accepted, SQLAlchemyUserDatastore
 from flask_security.utils import hash_password, verify_password
-from extentions import db
+from extentions import db, cache
 from helper_functions import get_or_create, get_or_create_features
 import datetime
 
@@ -74,7 +74,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
 
         return jsonify(results), 200
 
-    @app.route('/activate_spons/<id>')
+    @app.route('/activate_spons/<id>', methods=['GET'])
     @roles_required('admin')
     def activate_inst(id):
 

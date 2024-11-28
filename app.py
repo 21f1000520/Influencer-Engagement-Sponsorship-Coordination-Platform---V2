@@ -1,14 +1,15 @@
 from flask import Flask
-from extentions import db, security
+from extentions import db, security, cache
 from create_initial_data import create_data
 import entry_views
 import admin_views
 import dashboard_views
 import os
 basedir = os.path.abspath(os.path.dirname(__file__))
+
+
 def create_app():
     app = Flask(__name__)
-
 
     app.config['SECRET_KEY'] = "should-not-be-exposed"
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///data.db"
@@ -26,13 +27,14 @@ def create_app():
     app.config["CACHE_TYPE"] = "RedisCache"
     app.config["CACHE_REDIS_PORT"] = 6379
 
+    cache.init_app(app)
     db.init_app(app)
 
     with app.app_context():
         from models import User, Role
         from flask_security import SQLAlchemyUserDatastore
 
-        user_datastore = SQLAlchemyUserDatastore(db, User, Role) 
+        user_datastore = SQLAlchemyUserDatastore(db, User, Role)
         security.init_app(app, user_datastore)
         db.create_all()
         create_data(user_datastore)
@@ -42,14 +44,12 @@ def create_app():
     app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
 
     entry_views.create_entery_view(app, user_datastore)
-    admin_views.create_admin_views(app,user_datastore)
-    dashboard_views.create_dashboard_views(app,user_datastore)
+    admin_views.create_admin_views(app, user_datastore)
+    dashboard_views.create_dashboard_views(app, user_datastore)
     return app
 
 
-
-
+app = create_app()
 if __name__ == "__main__":
-    app = create_app()
     # app.run(debug=True)
     app.run(host='127.0.0.1', port=5000, debug=True, threaded=False)

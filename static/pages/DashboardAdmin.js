@@ -79,13 +79,13 @@ const DashboardAdmin = {
 
                 <hr>
                 <div class="input-group ">
-                    <input type="text" class="form-control" style="width:50%" placeholder="Search Sponsors by Name" v-model="Search_term_spons"  >
-                    <div class="input-group-btn">
+                    <input type="text" class="form-control" style="max-width:70% !important;" placeholder="Search Sponsors by Name" v-model="Search_term_spons"  >
+                    <div class="input-group-btn" style="margin-left:2% !important;">
                         <button class="btn btn-light" @click="search_spons">
                             <i class="bi bi-search"></i></i> 
                         </button>
                     </div>
-                    <div class="input-group-btn">
+                    <div class="input-group-btn" style="margin-left:2% !important;">
                         <button class="btn btn-light" @click="reload_spons">
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
@@ -127,13 +127,13 @@ const DashboardAdmin = {
 
                 <hr>
                 <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search Campaigns by Name or Details" v-model="Search_term_camp"  >
-                    <div class="input-group-btn">
+                    <input type="text" class="form-control" style="max-width:70% !important;" placeholder="Search Campaigns by Name or Details" v-model="Search_term_camp"  >
+                    <div class="input-group-btn" style="margin-left:2% !important;">
                         <button class="btn btn-light" @click="search_camp">
                             <i class="bi bi-search"></i></i> 
                         </button>
                     </div>
-                    <div class="input-group-btn">
+                    <div class="input-group-btn" style="margin-left:2% !important;">
                         <button class="btn btn-light" @click="reload_camp">
                             <i class="bi bi-arrow-clockwise"></i>
                         </button>
@@ -226,6 +226,19 @@ const DashboardAdmin = {
                             console.log("not found")
                         }
 
+                    }
+                }
+                this.all_influencers=new_array;
+            }else if (this.Search_term_inf.length===0 && this.platforms.length>0){
+                console.log('only plateforms')
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_inf, 'gi')
+                for (let element of this.all_influencers){
+                    if (this.check_plats(element.plateforms,this.platforms)){
+                        new_array.push(element)
+
+                    }else{
+                        console.log('not found')
                     }
                 }
                 this.all_influencers=new_array;
