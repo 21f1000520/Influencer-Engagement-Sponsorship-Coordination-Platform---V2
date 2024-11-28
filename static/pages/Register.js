@@ -181,7 +181,8 @@ computed: {
             fname:this.fname,
             lname:this.lname,
             industry:this.industry,
-            platforms:this.platforms
+            platforms:this.platforms,
+            aboutMe:this.aboutMe
           }),
           credentials: "same-origin",
         });

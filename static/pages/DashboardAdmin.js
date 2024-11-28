@@ -2,7 +2,7 @@ const DashboardAdmin = {
   template: `
         <div class="row d-flex justify-content-center">
             <div class="col-8  justify-content-center" style="text-align: center;">
-            <div class="badge rounded-pill px-4 py-0" style="background: #859F3D; margin-bottom:5%"><h1>Welcome Admin</h1></div>
+            <div class="badge rounded-pill px-4 py-0" style="background: #859F3D; margin-bottom:5%"><h1 class="display-5">Welcome Admin</h1></div>
                 <table class="table table-hover table-striped caption-top" v-if="all_influencers.length>0">
                 <caption v-if="all_influencers.length>0"><h1 class="display-5">Influencers</h1></caption>
                     <thead class="table-primary">
@@ -127,7 +127,11 @@ const DashboardAdmin = {
                 // }
                 this.Get_all_infls()
                 this.Get_all_spons()
-             }else {
+             }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+            }else {
                 const errorData = await res.json();
                 console.error("could not flag, failed:", errorData);
             }
@@ -155,7 +159,11 @@ const DashboardAdmin = {
                 //     alert('Un-Flagged')
                 // }
                 this.Get_all_camps()
-             }else {
+             }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+            }else {
                 const errorData = await res.json();
                 console.error("could not flag, failed:", errorData);
             }
@@ -178,7 +186,11 @@ const DashboardAdmin = {
                 // alert('Activated');
                 this.Get_all_infls()
                 this.Get_all_spons()
-             }else {
+             }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+            }else {
                 const errorData = await res.json();
                 console.error("could not activate, failed:", errorData);
             }
@@ -200,7 +212,11 @@ const DashboardAdmin = {
                 // alert('De-Activated');
                 this.Get_all_infls()
                 this.Get_all_spons()
-             }else {
+             }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+            }else {
                 const errorData = await res.json();
                 console.error("could not deactivate, failed:", errorData);
             }
@@ -220,7 +236,12 @@ const DashboardAdmin = {
                 const datas = await res.json();
                 this.all_influencers = datas;
                 // console.log(datas);
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
+            console.log(res.status===403)
             const errorData = await res.json();
             console.error("No influencers could be found, failed:", errorData);
             
@@ -240,6 +261,10 @@ const DashboardAdmin = {
                 const datas = await res.json();
                 this.all_sponsors = datas;
                 // console.log(datas2);
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
             const errorData = await res.json();
             console.error("No sponsor could be found, failed:", errorData);
@@ -264,6 +289,10 @@ const DashboardAdmin = {
                 console.log(datas);
                 this.all_camps=datas;
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
             const errorData = await res.json();
             console.error("No campaigns", errorData);

@@ -64,7 +64,7 @@ const router = new VueRouter({
 // frontend router protection
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresLogin)) {
-    console.log(store.getters.getLoginState)
+    console.log(store.getters.getLoginState,'login state',store.getters.getRole,'role')
     if (!store.getters.getLoginState) {
       console.log('inside loggedIn false');
       next({ path: "/login" });

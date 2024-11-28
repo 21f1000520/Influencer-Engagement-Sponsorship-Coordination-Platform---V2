@@ -82,3 +82,11 @@ body {
 .bg-custom{
     background-color: rgb(255, 112, 112);
 }
+
+.chart-container {
+    position: relative;
+    margin: auto;
+    height: 50%;
+    width: 100%;
+    /* max-width: 100%; */
+}

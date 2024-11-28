@@ -137,7 +137,11 @@ const AddCamp = {
                     this.$router.push("/dashboard-infl");
                     
                 }
-        } else {
+        } else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+            }else {
           const errorData = await res.json();
           console.error("Addition failed:", errorData);
           // Handle sign up error

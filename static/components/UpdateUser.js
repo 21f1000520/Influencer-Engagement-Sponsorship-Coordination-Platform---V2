@@ -102,6 +102,10 @@ const UpdateUser = {
         this.platforms=datas.plateforms;
         this.industry=datas.industry;
         
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
         }else {
             const errorData = await res.json();
             console.error("No current user:", errorData);
@@ -221,7 +225,11 @@ const UpdateUser = {
                         this.$router.push("/dashboard-infl");
                         
                     }
-                } else {
+                }else if(res.status===403 || res.status===401){
+                      console.error("Forbidden Request");
+                      sessionStorage.clear()
+                      this.$router.push("/login");
+                }else {
                 const errorData = await res.json();
                 console.error("Sign up failed:", errorData);
                 // Handle sign up error

@@ -5,7 +5,7 @@ const DashboardInfl = {
   template: `
             <div class="row d-flex justify-content-center">
               <div class="col-9  justify-content-center" style="text-align: center;">
-                <div class="badge rounded-pill px-4 py-0" style="background: rgb(177, 116, 87); margin-bottom:5%"><h1>Welcome {{this.user_data.fname}}</h1></div>
+                <div class="badge rounded-pill px-4 py-0" style="background: rgb(177, 116, 87); margin-bottom:5%"><h1 class="display-5">{{this.user_data.fname}} {{this.user_data.lname}}</h1></div>
                 
                 
                 <div v-if="this.flagged" class="alert alert-danger" role="alert"> 
@@ -95,17 +95,20 @@ const DashboardInfl = {
       },
     });
     if (res.ok){
-        const datas = await res.json();
-        // this.all_influencers = datas;
-        console.log(datas);
-        this.flagged=datas.flag;
-        this.user_data=datas;
-        console.log(this.user_data,'user data')
-    }else {
+          const datas = await res.json();
+          // this.all_influencers = datas;
+          console.log(datas);
+          this.flagged=datas.flag;
+          this.user_data=datas;
+          console.log(this.user_data,'user data')
+
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
+      }else {
       const errorData = await res.json();
       console.error("No current user:", errorData);
-      sessionStorage.clear()
-      this.$router.push("/login");
     }
 
     if (this.user_data.dp_name){
@@ -131,7 +134,11 @@ const DashboardInfl = {
             console.log(datas,'sent to infl');
             this.req_to_inf=datas;
             
-        }else {
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
+      }else {
         const errorData = await res.json();
         console.error("No requests to infl", errorData);
         }
@@ -175,7 +182,11 @@ const DashboardInfl = {
             console.log(datas);
             this.all_camps=datas;
             
-        }else {
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
+      }else {
         const errorData = await res.json();
         console.error("No campaigns", errorData);
         }
@@ -238,7 +249,11 @@ const DashboardInfl = {
         const response = await res.json();
         console.log(response);
         this.$router.go();
-    }else {
+    }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
+      }else {
       const errorData = await res.json();
       console.error("could not upload:", errorData);
       

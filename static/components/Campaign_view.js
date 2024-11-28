@@ -130,6 +130,10 @@ const campaign={
                 console.log(datas);
                 this.sent_reqs=datas;
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
             const errorData = await res.json();
             console.error("No requests to infl", errorData);
@@ -151,6 +155,10 @@ const campaign={
                 console.log(datas);
                 this.recieved_reqs=datas;
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
             const errorData = await res.json();
             console.error("No requests recieved to sponsor", errorData);
@@ -171,6 +179,10 @@ const campaign={
                 const datas = await res.json();
                 this.all_influencers = datas;
                 // console.log(datas);
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
             const errorData = await res.json();
             console.error("No influencers could be found, failed:", errorData);

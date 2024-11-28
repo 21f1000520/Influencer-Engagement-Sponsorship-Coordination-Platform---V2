@@ -8,7 +8,7 @@ const DashboardSpons = {
 
   template: `<div class="row d-flex justify-content-center" >
                 <div class="col-8  justify-content-center" style="text-align: center;">
-                    <div class="badge rounded-pill px-4 py-0 shadow" style="background: rgb(255, 178, 111); margin-bottom:5%"><h1>Welcome Sponsor {{this.user_data.fname}}</h1></div>
+                    <div class="badge rounded-pill px-4 py-0 shadow" style="background: rgb(255, 178, 111); margin-bottom:5%"><h1 class="display-5">{{this.user_data.fname}} {{this.user_data.lname}}</h1></div>
                     <div v-if="this.flagged" class="alert alert-danger" role="alert"> 
                         <h1>You Have been Flagged by Admin, contact Admin!!!</h1>
                     </div>
@@ -49,7 +49,11 @@ const DashboardSpons = {
             this.flagged=datas.flag;
             this.user_data=datas;
             console.log(this.user_data,'user data')
-        }else {
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
+      }else {
         let errorData = await res.json();
         console.error("No current user:", errorData);
         sessionStorage.clear()
@@ -94,7 +98,11 @@ const DashboardSpons = {
                 console.log(datas);
                 this.campaigns=datas;
                 console.log(this.campaigns,'campaigns data')
-            }else {
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
+                }else {
                 let errorData = await res.json();
                 console.error("No campaign found:", errorData);
         

@@ -232,6 +232,10 @@ const show_campaigns={
                 console.log(datas);
                 this.$emit('recal_sent_inf')
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete", errorData);
@@ -255,6 +259,10 @@ const show_campaigns={
                 console.log(datas);
                 this.$emit('recal_sent_spons')
                 
+            }else if(res.status===403 || res.status===401){
+                    console.error("Forbidden Request");
+                    sessionStorage.clear()
+                    this.$router.push("/login");
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete to spons", errorData);
@@ -278,7 +286,11 @@ const show_campaigns={
                 console.log(datas);
                 this.$emit('recal_sent_inf')
                 
-            }else {
+            }else if(res.status===403 || res.status===401){
+                    console.error("Forbidden Request");
+                    sessionStorage.clear()
+                    this.$router.push("/login");
+             }else {
                 const errorData = await res.json();
                 console.error("Could not reject", errorData);
             }
@@ -301,6 +313,10 @@ const show_campaigns={
                 console.log(datas);
                 this.$emit('recal_sent_inf')
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
                 const errorData = await res.json();
                 console.error("Could not accept", errorData);
@@ -327,6 +343,10 @@ const show_campaigns={
                 // this.Get_all_sent_to_infl();
                 this.$emit('recal_sent_spons')
 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
                 const errorData = await res.json();
                 console.error("Could not send req to infl", errorData);

@@ -502,7 +502,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                 'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
                                 'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
                                 'influencer_id':influencer.id,'influencer_name':inf_name,'sponsor_active':sponsor.active,
-                                'influencer_active':influencer.active,'sponsor_flag':SpF.flag,'influencer_flag':InF.flag})
+                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
         if running_to_spons:
             for r_to_s in running_to_spons:
                 camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
@@ -520,5 +520,5 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                    'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
                                    'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
                                    'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
-                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag})
+                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
         return jsonify(camp_array),200

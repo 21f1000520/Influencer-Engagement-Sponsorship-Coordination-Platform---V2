@@ -90,6 +90,10 @@ const UpdateCamp = {
             this.goal=datas.goals;
             this.visibility=datas.visibility;
             
+        }else if(res.status===403 || res.status===401){
+            console.error("Forbidden Request");
+            sessionStorage.clear()
+            this.$router.push("/login");
         }else {
         let errorData = await res.json();
         console.error("No campaign found:", errorData);
@@ -155,6 +159,10 @@ const UpdateCamp = {
                 this.$emit('ClosePopup')
                 
                 
+            }else if(res.status===403 || res.status===401){
+                console.error("Forbidden Request");
+                sessionStorage.clear()
+                this.$router.push("/login");
             }else {
                 let errorData = await res.json();
                 console.error("Could not update", errorData);
