@@ -4,17 +4,44 @@ const DashboardAdmin = {
             <div class="col-8  justify-content-center" style="text-align: center;">
             <div class="badge rounded-pill px-4 py-0" style="background: #859F3D; margin-bottom:5%"><h1 class="display-5">Welcome Admin</h1></div>
                 
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search Influencers by Name" v-model="Search_term_inf"  >
-                    <div class="input-group-btn">
-                        <button class="btn btn-default" @click="search_inf">
-                            <i class="bi bi-search"></i></i> 
-                        </button>
+                    
+
+                <form class="row g-3">
+                    <div class="col-4">
+                        <input type="text" class="form-control" placeholder="Search Influencers by Name" v-model="Search_term_inf"  >
                     </div>
-                </div>
+                    <div class="col-6">
+                        <div class="form-check form-switch form-check-inline">
+                            <input type="checkbox" id="Instagram" class="form-check-input" value="Instagram" v-model="platforms" />
+                            <label for="Instagram">Instagram</label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                            <input type="checkbox" id="Twitter" class="form-check-input" value="Twitter" v-model="platforms" />
+                            <label for="Twitter">Twitter</label>
+                        </div>
+                        <div class="form-check form-switch form-check-inline">
+                            <input type="checkbox" id="Youtube" class="form-check-input" value="Youtube" v-model="platforms" />
+                            <label for="Youtube">Youtube</label>
+                        </div>
+                    </div>
+                    <div class="col-2">
+                        <div class="input-group-btn">
+                            <button class="btn btn-light" @click="search_inf">
+                                <i class="bi bi-search"></i></i> 
+                            </button>
+                        
+                            <button class="btn btn-light" @click="reload_inf">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+
+
                 
                 <table class="table table-hover table-striped caption-top">
-                <caption v-if="all_influencers.length>0"><h1 class="display-5">Influencers {{Search_term_inf}}</h1></caption>
+                <caption><h1 class="display-5">Influencers</h1></caption>
                     <thead class="table-primary">
                         <tr>
                             <th scope="col">#</th>
@@ -51,16 +78,21 @@ const DashboardAdmin = {
                 </table>   
 
                 <hr>
-                <div class="input-group">
-                    <input type="text" class="form-control" placeholder="Search Sponsors by Name" v-model="Search_term_inf"  >
+                <div class="input-group ">
+                    <input type="text" class="form-control" style="width:50%" placeholder="Search Sponsors by Name" v-model="Search_term_spons"  >
                     <div class="input-group-btn">
-                        <button class="btn btn-default" @click="search_inf">
+                        <button class="btn btn-light" @click="search_spons">
                             <i class="bi bi-search"></i></i> 
                         </button>
                     </div>
+                    <div class="input-group-btn">
+                        <button class="btn btn-light" @click="reload_spons">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
                 </div>
-                <table class="table table-hover table-striped caption-top" v-if="all_sponsors.length>0">
-                <caption v-if="all_sponsors.length>0"><h1 class="display-5">Sponsors</h1></caption>
+                <table class="table table-hover table-striped caption-top" >
+                <caption><h1 class="display-5">Sponsors</h1></caption>
                     <thead class="table-danger">
                         <tr>
                             <th scope="col">#</th>
@@ -71,7 +103,7 @@ const DashboardAdmin = {
                             <th scope="col">Action</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody v-if="all_sponsors.length>0">
                         <tr v-for="(sponsor,index) in all_sponsors">
                             <td> {{ index+1 }} </td>
                             <td> {{ sponsor.fname }} </td>
@@ -88,9 +120,26 @@ const DashboardAdmin = {
                             </td>
                         </tr>
                     </tbody>
+                    <tbody v-else>
+                        <tr> <td colspan="6"> No Sponsors Found!! </td> </tr>
+                    </tbody>
                 </table>   
 
                 <hr>
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search Campaigns by Name or Details" v-model="Search_term_camp"  >
+                    <div class="input-group-btn">
+                        <button class="btn btn-light" @click="search_camp">
+                            <i class="bi bi-search"></i></i> 
+                        </button>
+                    </div>
+                    <div class="input-group-btn">
+                        <button class="btn btn-light" @click="reload_camp">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <table class="table table-hover table-striped caption-top" v-if="all_camps.length>0">
                 <caption v-if="all_camps.length>0"><h1 class="display-5">Campaigns</h1></caption>
                     <thead class="table-success">
@@ -128,31 +177,116 @@ const DashboardAdmin = {
             all_sponsors:[],
             all_camps:[],
             Search_term_inf:"",
+            Search_term_spons:"",
+            Search_term_camp:"",
+            platforms:[],
         };
     },
 
     methods:{
+        check_plats(array1,array2){
+            const found = array1.some(r=> array2.includes(r))
+            return found
+        },
+
         search_inf(){
             // console.log(this.Search_term_inf)
-            if (this.Search_term_inf.length>0){
-                let new_inf=[];
+            
+            if (this.Search_term_inf.length>0 && this.platforms.length===0){
+                let new_array=[];
                 let reg_search = new RegExp(this.Search_term_inf, 'gi')
                 console.log(reg_search)
-                for (let inf of this.all_influencers){
-                    console.log(inf.fname,inf.lname)
-                    if (inf.fname.search(reg_search)>=0){
+                for (let element of this.all_influencers){
+                    console.log(element.fname,element.lname)
+                    if (element.fname.search(reg_search)>=0){
                         console.log('found in first')
-                        new_inf.push(inf)
-                    }else if (inf.lname.search(reg_search)>=0){
+                        new_array.push(element)
+                    }else if (element.lname.search(reg_search)>=0){
                         console.log('found in last')
-                        new_inf.push(inf)
+                        new_array.push(element)
                     }else{
                         console.log("not found")
                     }
                 }
-                this.all_influencers=new_inf;
+                this.all_influencers=new_array;
+
+            }else if (this.Search_term_inf.length>0 && this.platforms.length>0){
+                console.log('name and plateforms')
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_inf, 'gi')
+                for (let element of this.all_influencers){
+                    if (this.check_plats(element.plateforms,this.platforms)){
+                        if (element.fname.search(reg_search)>=0){
+                            console.log('found in first')
+                            new_array.push(element)
+                        }else if (element.lname.search(reg_search)>=0){
+                            console.log('found in last')
+                            new_array.push(element)
+                        }else{
+                            console.log("not found")
+                        }
+
+                    }
+                }
+                this.all_influencers=new_array;
             }
         },
+        search_spons(){
+            console.log('search spons')
+            if (this.Search_term_spons.length>0){
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_spons, 'gi')
+                console.log(reg_search)
+                for (let element of this.all_sponsors){
+                    console.log(element.fname,element.lname)
+                    if (element.fname.search(reg_search)>=0){
+                        console.log('found in first')
+                        new_array.push(element)
+                    }else if (element.lname.search(reg_search)>=0){
+                        console.log('found in last')
+                        new_array.push(element)
+                    }else{
+                        console.log("not found")
+                    }
+                }
+                this.all_sponsors=new_array;
+            }
+        },
+        search_camp(){
+            console.log('search camps')
+            if (this.Search_term_camp.length>0){
+                let new_array=[];
+                let reg_search = new RegExp(this.Search_term_camp, 'gi')
+                console.log(reg_search)
+                for (let element of this.all_camps){
+                    console.log(element.name,element.description)
+                    if (element.name.search(reg_search)>=0){
+                        console.log('found in Name')
+                        new_array.push(element)
+                    }else if (element.description.search(reg_search)>=0){
+                        console.log('found in description')
+                        new_array.push(element)
+                    }else{
+                        console.log("not found")
+                    }
+                }
+                this.all_camps=new_array;
+            }
+        },
+        reload_inf(){
+            console.log('reload inf')
+            this.Get_all_infls()
+        },
+        reload_spons(){
+            console.log('reload spons')
+            this.Get_all_spons()
+        },
+        reload_camp(){
+            console.log('reload camps')
+            this.Get_all_camps()
+        },
+
+
         async Delete(id){
             console.log('delete user',id)
             const origin = window.location.origin;
