@@ -11,7 +11,7 @@ from models import influencer_features, sponsor_features, campaigns, recieved_ad
 def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
     @app.route('/users/<role>', methods=['GET'])
     @roles_accepted('admin', 'spons')
-    def get_influencers(role):
+    def get_users(role):
         print(role)
         all_users = user_datastore.user_model().query.all()
         filtered_users = []

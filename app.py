@@ -6,9 +6,10 @@ import admin_views
 import dashboard_views
 import os
 
+from celery.schedules import crontab
 from worker import celery_init_app
 import flask_excel as excel
-from tasks import daily_reminder
+from tasks import pending_requests_reminder, get_all_pending_all_inf
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -59,9 +60,12 @@ excel.init_excel(app)
 
 
 @celery_app.on_after_configure.connect
-def send_email(sender, **kwargs):
-    sender.add_periodic_task(60.0, daily_reminder.s(
-        'come again tommorow'), name='add every 60 seconds')
+def schedule_tasks(sender, **kwargs):
+
+    # sender.add_periodic_task(60.0, pending_requests_reminder.s(
+    #     'Pending Requests'), name='add every 60 seconds')
+    sender.add_periodic_task(crontab(hour=15, minute=10, day_of_week='1-6'),
+                             pending_requests_reminder.s('Pending Requests'), name='Daily Reminder Pending Requests')
 
 
 if __name__ == "__main__":

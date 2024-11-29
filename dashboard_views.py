@@ -6,9 +6,10 @@ from helper_functions import get_or_create, get_or_create_features
 from datetime import datetime
 import os
 from models import influencer_features, sponsor_features, platforms, campaigns
-from models import recieved_infl_req, recieved_ad_req
+from models import recieved_infl_req, recieved_ad_req, User
 from tasks import add, export_csv
 from celery.result import AsyncResult
+import math
 
 
 def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
@@ -559,3 +560,54 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return send_file('./downloads/file.csv', mimetype="application/csv", as_attachment=True), 200
         else:
             return jsonify({'message': 'task not ready'}), 405
+
+    @app.route('/get_all_pending_all_inf')
+    def get_all_pending_all_inf():
+        all_users = User.query.all()
+        print(all_users)
+        all_infls = []
+        for user in all_users:
+            role = user.roles[0].name
+            if role == 'infl':
+                all_infls.append(user)
+
+        print(all_infls)
+
+        Dic_all_inf_pend = {}
+        for infl in all_infls:
+            running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.infl_id == infl.id) &
+                                                           (recieved_ad_req.status == 'pending')).all()
+            running_to_spons = recieved_infl_req.query.filter((recieved_infl_req.inf_id == infl.id) &
+                                                              (recieved_infl_req.status == 'pending')).all()
+            if not running_to_infl and not running_to_spons:
+                continue
+
+            inf_name = infl.fname+' '+infl.lname
+            Dic_all_inf_pend[inf_name] = []
+            if running_to_infl:
+                for r_to_i in running_to_infl:
+                    camp = campaigns.query.filter_by(
+                        id=r_to_i.campaign_id).first()
+
+                    sponsor = User.query.filter_by(id=camp.s_id).first()
+
+                    sname = sponsor.fname+' '+sponsor.lname
+
+                    dic_inner = {'influecer_mail': infl.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                                 'sponsor_name': sname}
+                    Dic_all_inf_pend[inf_name].append(dic_inner)
+
+            if running_to_spons:
+                for r_to_s in running_to_spons:
+                    camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
+                    sponsor = User.query.filter_by(id=camp.s_id).first()
+                    sname = sponsor.fname+' '+sponsor.lname
+
+                    dic_inner = {'influecer_mail': infl.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                                 'sponsor_name': sname}
+                    Dic_all_inf_pend[inf_name].append(dic_inner)
+
+        if len(Dic_all_inf_pend) == 0:
+            return {'message': 'nothing is pending'}, 404
+
+        return jsonify(Dic_all_inf_pend)

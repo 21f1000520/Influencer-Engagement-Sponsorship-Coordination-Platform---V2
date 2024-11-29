@@ -5,7 +5,7 @@ from jinja2 import Template
 
 SMTP_SERVER = "localhost"
 SMTP_PORT = 1025
-SENDER_EMAIL = "abhishek@iitm"
+SENDER_EMAIL = "plateform@iitm.ac.in"
 SENDER_PASSWORD = ''
 
 
