@@ -1,3 +1,5 @@
-already_paid,budget,description,end_date,influencer_name,name,progress_%,start_date,visibility
-10000.0,50000.0,Show every video bbb,2024-12-07,Abhishek Sharma,Face powdernnn,28.33,2024-11-27,True
-1500.0,5000.0,Ye bechana  h ,2024-12-07,Abhishek Sharma,Lipstick Lal wali,34.85,2024-11-26,True
+already_paid,budget,description,name,progress_%,sponsor_name
+10000.0,50000.0,Show every video bbb,Face powdernnn,29.24,First Sponsor
+1500.0,5000.0,Ye bechana  h ,Lipstick Lal wali,35.68,First Sponsor
+5000.0,50000.0,Great Budget Phone,Samsung A series,10.27,Samsung India
+4500.0,15000.0,Show S24 every 5 minutes,Samsung S24,38.49,Samsung India

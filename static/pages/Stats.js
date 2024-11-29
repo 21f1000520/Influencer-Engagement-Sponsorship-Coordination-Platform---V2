@@ -40,8 +40,9 @@ const Stats = {
                                 <td class="h6 " v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
                             </tfoot>
                         </table>   
-                       <button type="button" v-if="this.task_id.length===0 && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
-                       <button type="button" v-else-if="this.task_id.length>0 && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
+                       <button type="button" v-if="!this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
+                       <button type="button" v-else-if="this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
+                       <span v-if='isWaiting'> Waiting... </span></div>
                      
                         <div v-show="this.progress.length>0" class="chart-container">
                             <canvas id="myChart"></canvas>
@@ -57,7 +58,7 @@ const Stats = {
             labels:[],
             payment:[],
             task_id:"",
-
+            isWaiting: false,
         }
     },
 
@@ -117,8 +118,9 @@ const Stats = {
             console.log('progress',this.progress)
         },
 
-        async get_celery_task_id(){
-            console.log('get celery task id')
+        async download_csv(){
+            console.log('download CSV')
+            this.isWaiting = true
             const origin = window.location.origin;
             const url = `${origin}/start-export`;
             const res = await fetch(url, {
@@ -128,78 +130,39 @@ const Stats = {
                 "Authentication-Token":sessionStorage.getItem("token"),
             },
             });
-            if (res.ok){
-                const datas = await res.json();
-                // this.all_influencers = datas;
-                console.log(datas,'celery task id');
-                this.task_id=datas.task_id
-                
-                
-            
-            }else {
-                const errorData = await res.json();
-                console.error("Could not get the celery task id", errorData);
-            }
-        },
+            const data = await res.json()
+            if (res.ok) {
+                const taskId = data['task_id']
+                console.log(taskId,'task id')
+                const intv = setInterval(async () => {
+                const url = `${origin}/download-export/${taskId}`;
+                const csv_res = await fetch(url, {
+                                    method: "GET",
+                                    headers: {
+                                        "Content-Type": "blob",
+                                        "Authentication-Token":sessionStorage.getItem("token"),
+                                    },
+                        });
+                if (csv_res.ok) {
+                    this.isWaiting = false
+                    clearInterval(intv)
+                    const blob = await csv_res.blob();
+                    // this.all_influencers = datas;
+                    console.log('success')
+                    const url = URL.createObjectURL(blob);
 
-        async Status(task_id){
-            const origin = window.location.origin;
-            const url = `${origin}/download-export/${task_id}`;
-            const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "blob",
-                "Authentication-Token":sessionStorage.getItem("token"),
-            },
-            });
-            if (res.ok){
-                const blob = await res.blob();
-                // this.all_influencers = datas;
-                console.log('success')
-                console.log(blob,'celery task');
-                const url = URL.createObjectURL(blob);
+                    // Create a temporary <a> element to trigger the download
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = this.all_running[0].current_user_role+'_'+this.all_running[0].current_user_name+'_'+taskId.slice(0, 5)+'.csv'; // Name of the file to be saved
+                    document.body.appendChild(link);
+                    link.click();
 
-                // Create a temporary <a> element to trigger the download
-                const link = document.createElement('a');
-                link.href = url;
-                link.download = this.all_running[0].current_user_role+'_'+this.all_running[0].current_user_name+'_'+this.task_id+'.csv'; // Name of the file to be saved
-                document.body.appendChild(link);
-                link.click();
-
-                // Clean up
-                link.remove();
-                URL.revokeObjectURL(url); // Free memory
-                return 'downloaded'
-                // return datas
-                
-                
-            }
-            else {
-                const errorData = await res.json();
-                // console.error("Could not get the celery task", errorData);
-            }
-        },
-
-        sleep(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        },
-        
-        async download_csv(){
-            console.log('download CSV')
-            if (this.task_id.length===0){
-                await this.get_celery_task_id()
-            }
-            console.log('task_id',this.task_id)
-            let s = await this.Status(this.task_id)
-            for (let index = 0; index < 10; index++) {
-                console.log(s)
-                s = await this.Status(this.task_id)
-                this.sleep(5000)
-                if (s==='downloaded'){
-                    this.task_id=""
-                    break;
+                    // Clean up
+                    link.remove();
+                    URL.revokeObjectURL(url); // Free memory
                 }
-                
+                }, 1000)
             }
             // setInterval(this.Status(task_id), 2000)
         },
