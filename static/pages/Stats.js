@@ -40,7 +40,8 @@ const Stats = {
                                 <td class="h6 " v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
                             </tfoot>
                         </table>   
-                       <button type="button" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
+                       <button type="button" v-if="this.task_id.length===0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
+                       <button type="button" v-else class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
                      
                         <div v-show="this.progress.length>0" class="chart-container">
                             <canvas id="myChart"></canvas>
@@ -156,7 +157,7 @@ const Stats = {
                 // this.all_influencers = datas;
                 console.log('success')
                 console.log(blob,'celery task');
-                         const url = URL.createObjectURL(blob);
+                const url = URL.createObjectURL(blob);
 
                 // Create a temporary <a> element to trigger the download
                 const link = document.createElement('a');
@@ -178,6 +179,10 @@ const Stats = {
                 // console.error("Could not get the celery task", errorData);
             }
         },
+
+        sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        },
         
         async download_csv(){
             console.log('download CSV')
@@ -186,10 +191,10 @@ const Stats = {
             }
             console.log('task_id',this.task_id)
             let s = await this.Status(this.task_id)
-            for (let index = 0; index < 5; index++) {
+            for (let index = 0; index < 10; index++) {
                 console.log(s)
-                setTimeout(1000)
                 s = await this.Status(this.task_id)
+                this.sleep(5000)
                 if (s==='downloaded'){
                     this.task_id=""
                     break;
@@ -229,49 +234,49 @@ const Stats = {
             }
         },
 
-    CreateChart(){
-        const ctx = document.getElementById('myChart');
-        console.log(this.progress)
-        new Chart(ctx, 
-                {
-                    type: 'bar',
-                    data: {
-                        labels: this.labels,
-                        datasets: [{
-                            label: 'Progress (%)',
-                            data: this.progress,
-                            borderColor: '#D6C0B3',
-                            backgroundColor: '#AB886D',
-                            borderWidth: 1,
-                            borderRadius: 10,
-                            
-                        }]
-                    },
-                    options: {
-                        responsive:true,
-                        scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    title:{
-                                        display:true,
-                                        text:'Progress'
-                                    },
-                                    max:100,
+        CreateChart(){
+            const ctx = document.getElementById('myChart');
+            console.log(this.progress)
+            new Chart(ctx, 
+                    {
+                        type: 'bar',
+                        data: {
+                            labels: this.labels,
+                            datasets: [{
+                                label: 'Progress (%)',
+                                data: this.progress,
+                                borderColor: '#D6C0B3',
+                                backgroundColor: '#AB886D',
+                                borderWidth: 1,
+                                borderRadius: 10,
                                 
-                                }
-                            },
-                        // barThickness: 100,
-                        plugins:{
-                            title:{
-                                display:true,
-                                text: 'Progress of All running ad requests'
-                            },
-                 
-                        }
-                    },
-                }
-            );
-    },
+                            }]
+                        },
+                        options: {
+                            responsive:true,
+                            scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        title:{
+                                            display:true,
+                                            text:'Progress'
+                                        },
+                                        max:100,
+                                    
+                                    }
+                                },
+                            // barThickness: 100,
+                            plugins:{
+                                title:{
+                                    display:true,
+                                    text: 'Progress of All running ad requests'
+                                },
+                    
+                            }
+                        },
+                    }
+                );
+        },
     
 
     },
