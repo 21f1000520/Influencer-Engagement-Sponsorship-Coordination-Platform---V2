@@ -96,6 +96,7 @@ const UpdateCamp = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+                this.$router.go()
         }else {
         let errorData = await res.json();
         console.error("No campaign found:", errorData);
@@ -181,6 +182,7 @@ const UpdateCamp = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 let errorData = await res.json();
                 console.error("Could not update", errorData);

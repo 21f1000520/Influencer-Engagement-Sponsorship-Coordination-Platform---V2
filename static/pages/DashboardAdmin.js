@@ -329,6 +329,7 @@ const DashboardAdmin = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("could not flag, failed:", errorData);
@@ -397,6 +398,7 @@ const DashboardAdmin = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("could not flag, failed:", errorData);
@@ -454,6 +456,7 @@ const DashboardAdmin = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("could not deactivate, failed:", errorData);
@@ -507,6 +510,7 @@ const DashboardAdmin = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
             const errorData = await res.json();
             console.error("No sponsor could be found, failed:", errorData);
@@ -537,6 +541,7 @@ const DashboardAdmin = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
             const errorData = await res.json();
             console.error("No campaigns", errorData);

@@ -228,6 +228,7 @@ const Stats = {
                 this.$store.commit("setRole", null);
                 
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("No running ads", errorData);

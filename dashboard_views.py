@@ -7,7 +7,7 @@ from datetime import datetime
 import os
 from models import influencer_features, sponsor_features, platforms, campaigns
 from models import recieved_infl_req, recieved_ad_req, User
-from tasks import add, export_csv
+from tasks import add, export_csv, Calc_progress
 from celery.result import AsyncResult
 import math
 
@@ -611,3 +611,79 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return {'message': 'nothing is pending'}, 404
 
         return jsonify(Dic_all_inf_pend)
+
+    @app.route('/get_all_camps_all_spons')
+    def get_all_camps_all_spons():
+        all_users = User.query.all()
+        print(all_users)
+        all_spons = []
+        for user in all_users:
+            role = user.roles[0].name
+            if role == 'spons':
+                all_spons.append(user)
+
+        print(all_spons)
+
+        Dic_all_spons_camps = {}
+        for spons in all_spons:
+            running_to_infl = recieved_ad_req.query.filter_by(
+                s_id=spons.id).all()
+            running_to_spons = recieved_infl_req.query.filter_by(
+                s_id=spons.id).all()
+            if not running_to_infl and not running_to_spons:
+                continue
+
+            spons_name = spons.fname+' '+spons.lname
+            Dic_all_spons_camps[spons_name] = []
+            if running_to_infl:
+                for r_to_i in running_to_infl:
+                    camp = campaigns.query.filter_by(
+                        id=r_to_i.campaign_id).first()
+
+                    influencer = User.query.filter_by(
+                        id=r_to_i.infl_id).first()
+                    inf_name = influencer.fname+' '+influencer.lname
+                    InF = db.session.query(
+                        influencer_features).filter_by(user_id=influencer.id).first()
+                    inf_about = InF.aboutMe
+
+                    Prog_f = None
+                    paid = None
+                    if r_to_i.status == 'accepted':
+                        Prog_f = Calc_progress(camp.start_date, camp.end_date)
+                        paid = math.floor(Prog_f*10)*camp.budget/10
+                        Prog_f = round(Prog_f*100, 2)
+
+                    dic_inner = {'sponsor_mail': spons.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                                 'influencer_name': inf_name, 'visibility': camp.visibility,
+                                 'status': r_to_i.status, 'influencer_details': inf_about,
+                                 'progress': Prog_f, 'already_paid': paid}
+                    Dic_all_spons_camps[spons_name].append(dic_inner)
+
+            if running_to_spons:
+                for r_to_s in running_to_spons:
+                    camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
+                    sponsor = User.query.filter_by(id=camp.s_id).first()
+                    sname = sponsor.fname+' '+sponsor.lname
+                    influencer = User.query.filter_by(id=r_to_s.inf_id).first()
+                    inf_name = influencer.fname+' '+influencer.lname
+                    InF = db.session.query(
+                        influencer_features).filter_by(user_id=influencer.id).first()
+                    inf_about = InF.aboutMe
+                    Prog_f = None
+                    paid = None
+                    if r_to_s.status == 'accepted':
+                        Prog_f = Calc_progress(camp.start_date, camp.end_date)
+                        paid = math.floor(Prog_f*10)*camp.budget/10
+                        Prog_f = round(Prog_f*100, 2)
+
+                    dic_inner = {'sponsor_mail': spons.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                                 'influencer_name': inf_name, 'visibility': camp.visibility,
+                                 'status': r_to_s.status, 'influencer_details': inf_about,
+                                 'progress': Prog_f, 'already_paid': paid}
+                    Dic_all_spons_camps[spons_name].append(dic_inner)
+
+        if len(Dic_all_spons_camps) == 0:
+            return {'message': 'no ad requests found'}, 404
+
+        return jsonify(Dic_all_spons_camps)

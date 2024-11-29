@@ -9,7 +9,7 @@ import os
 from celery.schedules import crontab
 from worker import celery_init_app
 import flask_excel as excel
-from tasks import pending_requests_reminder, get_all_pending_all_inf
+from tasks import pending_requests_reminder, monthly_report
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -66,6 +66,8 @@ def schedule_tasks(sender, **kwargs):
     #     'Pending Requests'), name='add every 60 seconds')
     sender.add_periodic_task(crontab(hour=15, minute=10, day_of_week='1-6'),
                              pending_requests_reminder.s('Pending Requests'), name='Daily Reminder Pending Requests')
+    sender.add_periodic_task(crontab(hour=19, minute=00, day_of_month='29'),
+                             monthly_report.s('Monthly Activity Report'), name='Monthly activity report')
 
 
 if __name__ == "__main__":

@@ -157,6 +157,7 @@ const AddCamp = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
           const errorData = await res.json();
           console.error("Addition failed:", errorData);

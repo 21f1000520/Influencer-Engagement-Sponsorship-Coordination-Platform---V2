@@ -53,7 +53,7 @@ const routes = [
   { path: "/stats", 
     name: "stats",
     component: Stats, 
-    meta: { loggedIn: true } },
+    meta: { requiresLogin: true } },
 ];
 
 const router = new VueRouter({
@@ -64,16 +64,16 @@ const router = new VueRouter({
 // frontend router protection
 router.beforeEach((to, from, next) => {
   if (to.matched.some((record) => record.meta.requiresLogin)) {
+    console.log('require log in')
     console.log(store.getters.getLoginState,'login state',store.getters.getRole,'role')
     if (!store.getters.getLoginState) {
-      console.log('inside loggedIn false');
+      console.log('State show not logged in');
       next({ path: "/login" });
     } else if (to.meta.role && to.meta.role !== store.getters.getRole) {
-      console.log('inside role false match');
+      console.log('logged in, require role, but role dont match');
       next({ path: "/" });
     } else {
-      console.log('third if after login and role match');
-
+      console.log('logged in and role match');
       next();
     }
   } else {

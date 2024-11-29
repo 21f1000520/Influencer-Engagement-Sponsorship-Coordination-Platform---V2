@@ -32,7 +32,7 @@ def Calc_progress(start: datetime, end: datetime):
     return frac
 
 
-def CreateEmailTemplate(name, contents):
+def CreateEmailTemplate_pending(name, contents):
     temp = """
         <!DOCTYPE html>
         <html>
@@ -128,7 +128,7 @@ def CreateEmailTemplate(name, contents):
                     <tr>
                     <th>Ad Name</th>
                     <th>Sponsored By</th>
-                    <th>Offered Amount</th>
+                    <th>Offered Amount ( &#x20b9 )</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -144,6 +144,154 @@ def CreateEmailTemplate(name, contents):
             </div>
             <p>
                 To learn more about other requests please visit your dashboard
+            </p>
+            <p>
+            <strong>Regards</strong>
+            </p>
+            <p>
+            Plateform Team
+            </p>
+            </div>
+            <div class="footer">
+            <p>
+                &copy; 2024 Influencer Sponsor Plateform
+            </p>
+            </div>
+        </div>
+        </body>
+        </html>
+
+    """
+    template = Template(temp)
+    return template.render(name=name, contents=contents)
+
+
+def CreateEmailTemplate_monthly(name, contents):
+    temp = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+        <title>Monthly Activity</title>
+        <style>
+            body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            }
+            .email-container {
+            max-width: 60%;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+            text-align: center;
+            padding: 10px 0;
+            background: #007bff;
+            color: #ffffff;
+            border-radius: 8px 8px 0 0;
+            }
+            .content {
+            padding: 20px;
+            line-height: 1.6;
+            color: #333333;
+            }
+            .table-section {
+            margin: 20px 0;
+            }
+            table {
+            width: 100%;
+            border-collapse: collapse;
+            }
+            table th, table td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #dddddd;
+            }
+            table th {
+            background-color: #007bff;
+            color: #ffffff;
+            }
+            .footer {
+            text-align: center;
+            padding: 10px;
+            font-size: 12px;
+            color: #777777;
+            }
+            a {
+            color: #007bff;
+            text-decoration: none;
+            }
+            a:hover {
+            text-decoration: underline;
+            }
+            .button {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #007bff;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            }
+            .button:hover {
+            background: #0056b3;
+            }
+        </style>
+        </head>
+        <body>
+        <div class="email-container">
+            <div class="header">
+            <h1>Influencer Sponsor Plateform</h1>
+            </div>
+            <div class="content">
+            <h2>Dear {{name}},</h2>
+            <p>
+                Thank you for being a valueable member of our plateform! As a part of our promise we are happy to share 
+                the monthly activity report on your ad campaigns.
+                
+            </p>
+            <p>
+                Below is your monthly report of all the ad campaigns that you ran till this month:
+            </p>
+            <div class="table-section">
+                <table>
+                <thead>
+                    <tr>
+                    <th>Ad Name</th>
+                    <th>Influencer Targetted</th>
+                    <th>Influencer Details</th>
+                    <th>Offered Amount ( &#x20b9 )</th>
+                    <th>Request Status</th>
+                    <th>Progress</th>
+                    <th>Already Paid ( &#x20b9 )</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for content in contents %}
+                    <tr>
+                    <td>{{ content.campaign_name }}</td>
+                    <td>{{ content.influencer_name }}</td>
+                    <td>{{ content.influencer_details }}</td>
+                    <td>{{ content.campaign_budget }}</td>
+                    <td>{{ content.status }}</td>
+                    {% if content.progress %}
+                        <td>{{ content.progress }}</td>
+                        <td>{{ content.already_paid }}</td>
+                    {% else %}
+                        <td> -- </td>
+                        <td> -- </td>
+                    {% endif %}
+                    </tr>
+                {% endfor %}
+                </tbody>
+                </table>
+            </div>
+            <p>
+                Please visit your dashboard and stats page to get more details
             </p>
             <p>
             <strong>Regards</strong>
@@ -274,7 +422,7 @@ def export_csv(role, id):
     dic = get_all_running_dic(role, id)
     if role == 'spons':
         columns = ['name', 'description',
-                   'budget', 'influencer_name', 'progress_%', 'already_paid']
+                   'budget', 'influencer_name', 'visibility', 'start_date', 'end_date', 'progress_%', 'already_paid']
     elif role == 'infl':
         columns = ['name', 'description',
                    'budget', 'sponsor_name', 'progress_%', 'already_paid']
@@ -344,6 +492,79 @@ def get_all_pending_all_inf():
     return Dic_all_inf_pend
 
 
+def get_all_camps_all_spons():
+    all_users = User.query.all()
+    # print(all_users)
+    all_spons = []
+    for user in all_users:
+        role = user.roles[0].name
+        if role == 'spons':
+            all_spons.append(user)
+
+    # print(all_spons)
+
+    Dic_all_spons_camps = {}
+    for spons in all_spons:
+        running_to_infl = recieved_ad_req.query.filter_by(
+            s_id=spons.id).all()
+        running_to_spons = recieved_infl_req.query.filter_by(
+            s_id=spons.id).all()
+        if not running_to_infl and not running_to_spons:
+            continue
+
+        spons_name = spons.fname+' '+spons.lname
+        Dic_all_spons_camps[spons_name] = []
+        if running_to_infl:
+            for r_to_i in running_to_infl:
+                camp = campaigns.query.filter_by(
+                    id=r_to_i.campaign_id).first()
+
+                influencer = User.query.filter_by(
+                    id=r_to_i.infl_id).first()
+                inf_name = influencer.fname+' '+influencer.lname
+                InF = db.session.query(
+                    influencer_features).filter_by(user_id=influencer.id).first()
+                inf_about = InF.aboutMe
+
+                Prog_f = None
+                paid = None
+                if r_to_i.status == 'accepted':
+                    Prog_f = Calc_progress(camp.start_date, camp.end_date)
+                    paid = math.floor(Prog_f*10)*camp.budget/10
+                    Prog_f = round(Prog_f*100, 2)
+
+                dic_inner = {'sponsor_mail': spons.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                             'influencer_name': inf_name, 'visibility': camp.visibility,
+                             'status': r_to_i.status, 'influencer_details': inf_about,
+                             'progress': Prog_f, 'already_paid': paid}
+                Dic_all_spons_camps[spons_name].append(dic_inner)
+
+        if running_to_spons:
+            for r_to_s in running_to_spons:
+                camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
+                sponsor = User.query.filter_by(id=camp.s_id).first()
+                sname = sponsor.fname+' '+sponsor.lname
+                influencer = User.query.filter_by(id=r_to_s.inf_id).first()
+                inf_name = influencer.fname+' '+influencer.lname
+                InF = db.session.query(
+                    influencer_features).filter_by(user_id=influencer.id).first()
+                inf_about = InF.aboutMe
+                Prog_f = None
+                paid = None
+                if r_to_s.status == 'accepted':
+                    Prog_f = Calc_progress(camp.start_date, camp.end_date)
+                    paid = math.floor(Prog_f*10)*camp.budget/10
+                    Prog_f = round(Prog_f*100, 2)
+
+                dic_inner = {'sponsor_mail': spons.email, 'campaign_name': camp.name, 'campaign_budget': camp.budget,
+                             'influencer_name': inf_name, 'visibility': camp.visibility,
+                             'status': r_to_s.status, 'influencer_details': inf_about,
+                             'progress': Prog_f, 'already_paid': paid}
+                Dic_all_spons_camps[spons_name].append(dic_inner)
+
+    return Dic_all_spons_camps
+
+
 @shared_task()
 def pending_requests_reminder(message):
     Dic_all_inf_pend = get_all_pending_all_inf()
@@ -352,6 +573,19 @@ def pending_requests_reminder(message):
         for name, contents in Dic_all_inf_pend.items():
             # print(contents)
             send_email(contents[0]['influecer_mail'], message,
-                       CreateEmailTemplate(name=name, contents=contents))
+                       CreateEmailTemplate_pending(name=name, contents=contents))
+        return "OK"
+    return 'not sent'
+
+
+@shared_task()
+def monthly_report(message):
+    Dic_all_spons_camps = get_all_camps_all_spons()
+    print(len(Dic_all_spons_camps))
+    if len(Dic_all_spons_camps) > 0:
+        for name, contents in Dic_all_spons_camps.items():
+            # print(contents)
+            send_email(contents[0]['sponsor_mail'], message,
+                       CreateEmailTemplate_monthly(name=name, contents=contents))
         return "OK"
     return 'not sent'

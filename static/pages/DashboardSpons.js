@@ -54,14 +54,14 @@ const DashboardSpons = {
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
-            this.$router.push("/login");
+            this.$router.push("/login");this.$router.go()
       }else {
         let errorData = await res.json();
         console.error("No current user:", errorData);
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
-        this.$router.push("/login");
+        this.$router.push("/login");this.$router.go()
         // this.$router.go();
         
         }
@@ -107,7 +107,7 @@ const DashboardSpons = {
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
-                this.$router.push("/login");
+                this.$router.push("/login");this.$router.go()
                 }else {
                 let errorData = await res.json();
                 console.error("No campaign found:", errorData);

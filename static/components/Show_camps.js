@@ -315,6 +315,7 @@ const show_campaigns={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete", errorData);
@@ -344,6 +345,7 @@ const show_campaigns={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                     this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete to spons", errorData);
@@ -373,6 +375,7 @@ const show_campaigns={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                     this.$router.push("/login");
+                this.$router.go()
              }else {
                 const errorData = await res.json();
                 console.error("Could not reject", errorData);
@@ -402,6 +405,7 @@ const show_campaigns={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not accept", errorData);
@@ -434,6 +438,7 @@ const show_campaigns={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not send req to infl", errorData);

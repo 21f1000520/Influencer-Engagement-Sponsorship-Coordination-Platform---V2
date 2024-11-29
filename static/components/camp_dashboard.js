@@ -330,6 +330,7 @@ const camp_dashboard={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete", errorData);
@@ -359,6 +360,7 @@ const camp_dashboard={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not delete to spons", errorData);
@@ -387,6 +389,7 @@ const camp_dashboard={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not reject to spons", errorData);
@@ -415,6 +418,7 @@ const camp_dashboard={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not accept to spons", errorData);
@@ -447,6 +451,7 @@ const camp_dashboard={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
                 const errorData = await res.json();
                 console.error("Could not send req to infl", errorData);

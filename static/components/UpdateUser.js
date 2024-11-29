@@ -108,6 +108,7 @@ const UpdateUser = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+                this.$router.go()
         }else {
             const errorData = await res.json();
             console.error("No current user:", errorData);
@@ -233,6 +234,7 @@ const UpdateUser = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                       this.$router.push("/login");
+                this.$router.go()
                 }else {
                 const errorData = await res.json();
                 console.error("Sign up failed:", errorData);

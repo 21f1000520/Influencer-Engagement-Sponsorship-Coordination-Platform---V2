@@ -111,6 +111,7 @@ const DashboardInfl = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+            this.$router.go()
       }else {
       const errorData = await res.json();
       console.error("No current user:", errorData);
@@ -145,6 +146,7 @@ const DashboardInfl = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+            this.$router.go()
       }else {
         const errorData = await res.json();
         console.error("No requests to infl", errorData);
@@ -195,6 +197,7 @@ const DashboardInfl = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+            this.$router.go()
       }else {
         const errorData = await res.json();
         console.error("No campaigns", errorData);
@@ -264,6 +267,8 @@ const DashboardInfl = {
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
             this.$router.push("/login");
+            this.$router.go()
+
       }else {
       const errorData = await res.json();
       console.error("could not upload:", errorData);

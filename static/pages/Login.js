@@ -32,6 +32,12 @@ const Login = {
       notActive:false,
     };
   },
+
+  mounted(){
+    // this.$router.go();
+    console.log('mounted log in page')
+    this.$store.commit("logout", false);
+  },
   methods: {
 
 

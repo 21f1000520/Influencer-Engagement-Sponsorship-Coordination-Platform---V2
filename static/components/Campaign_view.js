@@ -136,6 +136,7 @@ const campaign={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
             const errorData = await res.json();
             console.error("No requests to infl", errorData);
@@ -163,6 +164,7 @@ const campaign={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
             const errorData = await res.json();
             console.error("No requests recieved to sponsor", errorData);
@@ -189,6 +191,7 @@ const campaign={
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
+                this.$router.go()
             }else {
             const errorData = await res.json();
             console.error("No influencers could be found, failed:", errorData);
