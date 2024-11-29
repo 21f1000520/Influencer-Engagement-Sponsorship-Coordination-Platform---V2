@@ -8,7 +8,7 @@ import os
 
 from worker import celery_init_app
 import flask_excel as excel
-
+from tasks import daily_reminder
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -56,6 +56,14 @@ def create_app():
 app, user_datastore = create_app()
 celery_app = celery_init_app(app)
 excel.init_excel(app)
+
+
+@celery_app.on_after_configure.connect
+def send_email(sender, **kwargs):
+    sender.add_periodic_task(60.0, daily_reminder.s(
+        'come again tommorow'), name='add every 60 seconds')
+
+
 if __name__ == "__main__":
     # app.run(debug=True)
     app.run(debug=True, threaded=False)

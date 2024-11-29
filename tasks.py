@@ -7,6 +7,7 @@ from extentions import db
 import flask_excel as excel
 import os
 from datetime import datetime
+from mail_service import send_email
 
 
 @shared_task()
@@ -157,3 +158,9 @@ def export_csv(role, id):
     with open('./downloads/file.csv', 'wb') as file:
         file.write(csv_out.data)
     return "file.csv"
+
+
+@shared_task()
+def daily_reminder(message):
+    send_email('harsh.gmail', message, '<h1> content body </h1>')
+    return "OK"

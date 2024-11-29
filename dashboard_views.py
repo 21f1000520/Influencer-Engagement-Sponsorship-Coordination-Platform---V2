@@ -468,6 +468,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
     @auth_required('token')
     def get_all_running():
         role = current_user.roles[0].name
+        current_user_name = current_user.fname+' '+current_user.lname
         if role == 'spons':
             running_to_infl = recieved_ad_req.query.filter((recieved_ad_req.s_id == current_user.id) &
                                                            (recieved_ad_req.status == 'accepted')).all()
@@ -505,7 +506,8 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                    'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
                                    'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
                                    'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
-                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
+                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag,
+                                   'current_user_role': role, 'current_user_name': current_user_name})
         if running_to_spons:
             for r_to_s in running_to_spons:
                 camp = campaigns.query.filter_by(id=r_to_s.camp_id).first()
@@ -523,7 +525,8 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                    'budget': camp.budget, 'goals': camp.goals, 'visibility': camp.visibility,
                                    'flag': camp.flag, 'id': camp.id, 'sponsor_id': camp.s_id, 'sponsor_name': sname,
                                    'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
-                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
+                                   'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag,
+                                   'current_user_role': role, 'current_user_name': current_user_name})
         return jsonify(camp_array), 200
 
     @app.route('/celerydemo')

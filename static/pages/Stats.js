@@ -40,8 +40,8 @@ const Stats = {
                                 <td class="h6 " v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
                             </tfoot>
                         </table>   
-                       <button type="button" v-if="this.task_id.length===0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
-                       <button type="button" v-else class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
+                       <button type="button" v-if="this.task_id.length===0 && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
+                       <button type="button" v-else-if="this.task_id.length>0 && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
                      
                         <div v-show="this.progress.length>0" class="chart-container">
                             <canvas id="myChart"></canvas>
@@ -162,7 +162,7 @@ const Stats = {
                 // Create a temporary <a> element to trigger the download
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = this.all_running[0].current_user_role+'_'+this.task_id+'.csv'; // Name of the file to be saved
+                link.download = this.all_running[0].current_user_role+'_'+this.all_running[0].current_user_name+'_'+this.task_id+'.csv'; // Name of the file to be saved
                 document.body.appendChild(link);
                 link.click();
 
