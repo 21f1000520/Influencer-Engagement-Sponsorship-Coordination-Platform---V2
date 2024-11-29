@@ -5,6 +5,11 @@ import entry_views
 import admin_views
 import dashboard_views
 import os
+
+from worker import celery_init_app
+import flask_excel as excel
+
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 
@@ -27,7 +32,6 @@ def create_app():
     app.config["CACHE_TYPE"] = "RedisCache"
     app.config["CACHE_REDIS_PORT"] = 6379
 
-    cache.init_app(app)
     db.init_app(app)
 
     with app.app_context():
@@ -46,10 +50,12 @@ def create_app():
     entry_views.create_entery_view(app, user_datastore)
     admin_views.create_admin_views(app, user_datastore)
     dashboard_views.create_dashboard_views(app, user_datastore)
-    return app
+    return app, user_datastore
 
 
-app = create_app()
+app, user_datastore = create_app()
+celery_app = celery_init_app(app)
+excel.init_excel(app)
 if __name__ == "__main__":
     # app.run(debug=True)
-    app.run(host='127.0.0.1', port=5000, debug=True, threaded=False)
+    app.run(debug=True, threaded=False)

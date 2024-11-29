@@ -1,12 +1,14 @@
 from flask import jsonify, render_template, render_template_string, request, send_file
 from flask_security import auth_required, current_user, roles_required, roles_accepted, SQLAlchemyUserDatastore
 from flask_security.utils import hash_password, verify_password
-from extentions import db, cache
+from extentions import db
 from helper_functions import get_or_create, get_or_create_features
 from datetime import datetime
 import os
 from models import influencer_features, sponsor_features, platforms, campaigns
 from models import recieved_infl_req, recieved_ad_req
+from tasks import add, export_csv
+from celery.result import AsyncResult
 
 
 def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
@@ -146,7 +148,6 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
 
     @app.route('/get_campaigns', methods=['GET'])
     @roles_required("spons")
-    @cache.cached(timeout=20)
     def get_campaigns():
         SpF = db.session.query(
             sponsor_features).filter_by(user_id=current_user.id).first()
@@ -194,6 +195,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
     @app.route('/update_campaigns/<id>', methods=['PUT'])
     @roles_required("spons")
     def update_campaigns(id):
+        print('update campaign')
         SpF = db.session.query(
             sponsor_features).filter_by(user_id=current_user.id).first()
         current_camp = campaigns.query.filter(
@@ -203,6 +205,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({'message': 'No such campaign with this id'}), 404
 
         data = request.get_json()
+        print(data)
         name = data.get("name")
         description = data.get("description")
         startDate = ""
@@ -215,21 +218,23 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         goal = data.get("goal")
         visibility = data.get("visibility")
         # return jsonify(data)
+        print(startDate, endDate)
         if name:
             current_camp.name = name
         if description:
             current_camp.description = description
         if startDate:
-            current_camp.startDate = startDate
+            print('inside start date')
+            current_camp.start_date = startDate
         if endDate:
-            current_camp.endDate = endDate
+            current_camp.end_date = endDate
         if budget:
             current_camp.budget = budget
         if goal:
-            current_camp.goal = goal
+            current_camp.goals = goal
         if visibility != "":
             current_camp.visibility = visibility
-
+        print(current_camp.start_date)
         # find the index of current campaign
         i = SpF.campaigns.index(current_camp)
         SpF.campaigns = SpF.campaigns[:i]+[current_camp]+SpF.campaigns[i+1:]
@@ -340,7 +345,6 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({"message": 'Could not send', 'error': e}), 408
 
     @app.route('/get_all_req_to_inf', methods=['GET'])
-    @cache.cached(timeout=1)
     @auth_required('token')
     def get_all_req_infl():
         all_req = recieved_ad_req.query.all()
@@ -360,7 +364,6 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
         return jsonify(reqs_json), 200
 
     @app.route('/get_all_req_to_spons', methods=['GET'])
-    @cache.cached(timeout=1)
     @auth_required('token')
     def get_all_req_spons():
         all_req = recieved_infl_req.query.all()
@@ -462,7 +465,6 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
             return jsonify({"message": 'reject failed', 'error': e}), 408
 
     @app.route('/get_all_running', methods=['GET'])
-    @cache.cached(timeout=20)
     @auth_required('token')
     def get_all_running():
         role = current_user.roles[0].name
@@ -523,3 +525,34 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
                                    'influencer_id': influencer.id, 'influencer_name': inf_name, 'sponsor_active': sponsor.active,
                                    'influencer_active': influencer.active, 'sponsor_flag': SpF.flag, 'influencer_flag': InF.flag, 'current_user_role': role})
         return jsonify(camp_array), 200
+
+    @app.route('/celerydemo')
+    def celery_demo():
+        task = add.delay(10, 20)
+        return jsonify({'task_id': task.id})
+
+    @app.route('/celerytask/<task_id>')
+    def celerytask(task_id):
+        task_result = AsyncResult(task_id)
+
+        if task_result.ready():
+            return jsonify({'data': task_result.result}), 200
+        else:
+            return jsonify({'message': 'data not ready'}), 405
+
+    @app.route('/start-export')
+    @auth_required('token')
+    def start_export():
+        role = current_user.roles[0].name
+        id = current_user.id
+        task = export_csv.delay(role, id)
+        return jsonify({'task_id': task.id}), 200
+
+    @app.route('/download-export/<task_id>')
+    @auth_required('token')
+    def download_export(task_id):
+        task_result = AsyncResult(task_id)
+        if task_result.ready():
+            return send_file('./downloads/file.csv', mimetype="application/csv", as_attachment=True), 200
+        else:
+            return jsonify({'message': 'task not ready'}), 405
