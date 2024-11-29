@@ -64,9 +64,9 @@ def schedule_tasks(sender, **kwargs):
 
     # sender.add_periodic_task(60.0, pending_requests_reminder.s(
     #     'Pending Requests'), name='add every 60 seconds')
-    sender.add_periodic_task(crontab(hour=15, minute=10, day_of_week='1-6'),
+    sender.add_periodic_task(crontab(hour=19, minute=50, day_of_week='1-6'),
                              pending_requests_reminder.s('Pending Requests'), name='Daily Reminder Pending Requests')
-    sender.add_periodic_task(crontab(hour=19, minute=00, day_of_month='29'),
+    sender.add_periodic_task(crontab(hour=19, minute=50, day_of_month='29'),
                              monthly_report.s('Monthly Activity Report'), name='Monthly activity report')
 
 
