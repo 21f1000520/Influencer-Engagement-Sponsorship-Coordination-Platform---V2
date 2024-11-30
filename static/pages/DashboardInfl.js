@@ -16,22 +16,22 @@ const DashboardInfl = {
                     <div class="row align-items-center" >
 
                         <div class="col-6 align-items-center rounded" style="margin-top: 1%;">
-                          <img v-bind:src="'/static/images/'+imagename" class="rounded img-fluid" alt="Profile Picture" style="max-width: 70%;">
+                          <img v-bind:src="'/static/images/'+imagename" class="rounded img-fluid" alt="Profile Picture" style=" max-width: 100%; height: auto;">
                           <div class="form-container">
-                            <label for = "file" class="form-label" style="margin-top:10%;"><h6>Upload Profile Pic</h6></label>
-                            <input class="form-control" type="file" @change="handleFileUpload( $event )" id='file'/>
+                            <label for = "file" class="form-label" style="margin-top:10%; font-size: 1.5vw;">Upload Profile Pic</label>
+                            <input class="form-control" type="file" @change="handleFileUpload( $event )" id='file' style="font-size: 1.5vw;" />
                             <div style="margin-top:5%;">
-                              <button v-if="showupload" @click="uploadImage" class="btn btn-primary">Upload</button>
-                              <button v-else class="btn btn-light " disabled >Upload</button>
+                              <button v-if="showupload" @click="uploadImage" class="btn btn-primary w-50" style="font-size: 2vw;">Upload</button>
+                              <button v-else class="btn btn-light w-50" style="font-size: 2vw;" disabled >Upload</button>
                             </div>
                           </div>
                         </div>
 
                         <div class="col-8 shadow-lg p-3 mb-5 bg-transparent rounded" style="margin-top: 0%; background:rgb(210, 233, 233); width:50%; border-radius: 50px;">
                             <ul class="list-group list-group-flush bg-transparent" >
-                                <li class="list-group-item display-5 bg-transparent"> {{this.user_data.fname}} {{this.user_data.lname}} </li>
-                                <li class="list-group-item h5 bg-transparent"> {{this.user_data.email}} </li>
-                                <li class="list-group-item h5 bg-transparent" v-if="this.user_data.role==='infl'">
+                                <li class="list-group-item display-5 bg-transparent" style="font-size: 5vw;"> {{this.user_data.fname}} {{this.user_data.lname}} </li>
+                                <li class="list-group-item  bg-transparent" style="font-size: 2.5vw;"> {{this.user_data.email}} </li>
+                                <li class="list-group-item  bg-transparent" v-if="this.user_data.role==='infl'"  style="font-size: 2vw;">
                                   <span class="badge bg-secondary h5" style="margin-left:5%;" v-for="(plt,index2) in this.user_data.plateforms"> 
                                     <i v-if="plt==='Instagram'" class="bi bi-instagram"></i> 
                                     <i v-if="plt==='Youtube'" class="bi bi-youtube"></i>
@@ -39,7 +39,7 @@ const DashboardInfl = {
                                     {{ plt }}
                                   </span>
                                 </li>
-                                <li class="list-group-item h5 text-muted bg-transparent" style="columns: red;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
+                                <li class="list-group-item h5 text-muted bg-transparent" style="columns: red; font-size: 1.5vw;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
                             </ul>
                             <div style="margin-top:5%">
                                 <a class="btn btn-outline-info h2" @click="update_profile"> Update Profile </a>

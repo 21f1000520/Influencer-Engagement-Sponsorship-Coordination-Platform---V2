@@ -72,4 +72,4 @@ def schedule_tasks(sender, **kwargs):
 
 if __name__ == "__main__":
     # app.run(debug=True)
-    app.run(debug=True, threaded=False)
+    app.run(host='0.0.0.0', port='7000', debug=True, threaded=False)

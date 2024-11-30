@@ -34,7 +34,8 @@ const camp_dashboard={
                     </div>
                 </div>
             </form>
-
+            
+            <div class="table-responsive">
             <table class="table table-hover table-striped caption-top" v-if="untouched_influencer.length>0">
             <caption v-if="untouched_influencer.length>0"><h1 class="display-5">Available Influencers</h1></caption>
                 <thead>
@@ -154,6 +155,7 @@ const camp_dashboard={
                 </tr>
                 </tbody>
             </table>   
+            </div>
             <div v-if="this.all_influencers.length===0" class="mt-5">
                 <h1 class="display-5 px-4 py-2 rounded-pill bg-warning" >No Influencers Found!!</h1>
             </div>

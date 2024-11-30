@@ -17,7 +17,7 @@ const show_campaigns={
         </div>
     </div>
 
-
+    <div class="table-responsive">
     <table class="table table-hover table-striped caption-top" >
     <caption ><h1 class="display-5">Available Campaigns</h1></caption>
             <thead class="table-primary">
@@ -139,7 +139,7 @@ const show_campaigns={
                 <tr> <td colspan="7"> No Campaigns Found!! </td> </tr>
             </tbody>
         </table>
-
+        </div>
 
     </div>
     `,

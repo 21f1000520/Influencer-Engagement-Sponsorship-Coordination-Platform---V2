@@ -87,6 +87,10 @@ body {
     position: relative;
     margin: auto;
     height: 100%;
-    width: 80%;
-    max-width: 100%;
+    width: 60%;
+    
+}
+
+#app{
+    flex-wrap: nowrap;
 }

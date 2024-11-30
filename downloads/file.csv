@@ -1,5 +1,7 @@
-already_paid,budget,description,name,progress_%,sponsor_name
-10000.0,50000.0,Show every video bbb,Face powdernnn,29.24,First Sponsor
-1500.0,5000.0,Ye bechana  h ,Lipstick Lal wali,35.68,First Sponsor
-5000.0,50000.0,Great Budget Phone,Samsung A series,10.27,Samsung India
-4500.0,15000.0,Show S24 every 5 minutes,Samsung S24,38.49,Samsung India
+budget,description,influencer_name,name,progress_%,sponsor_name
+50000.0,Show every video bbb,Rocky Balboa,Face powdernnn,29.27,First Sponsor
+50000.0,Show every video bbb,Abhishek Sharma,Face powdernnn,29.27,First Sponsor
+5000.0,Ye bechana  h ,Abhishek Sharma,Lipstick Lal wali,35.7,First Sponsor
+50000.0,Great Budget Phone,Abhishek Sharma,Samsung A series,10.3,Samsung India
+15000.0,Show S24 every 5 minutes,Abhishek Sharma,Samsung S24,38.54,Samsung India
+15000.0,Show S24 every 5 minutes,Rocky Balboa,Samsung S24,38.54,Samsung India
