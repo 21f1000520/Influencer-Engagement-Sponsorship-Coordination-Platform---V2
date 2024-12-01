@@ -40,7 +40,7 @@ const show_campaigns={
                     <td>{{ Campaign.goals }}</td>
                     <td>{{ Campaign.sponsor_name }}</td>
                     <td>
-                        <button type="button" class="btn btn-primary" @click="Send_Req_to_spons(Campaign.id)"><i class="bi bi-send"></i> Send Request</button> 
+                        <button type="button" class="btn btn-primary btn-custom" @click="Send_Req_to_spons(Campaign.id)"  ><i class="bi bi-send"></i> Send Request</button> 
                     </td>
                     
                 </tr>
@@ -75,18 +75,18 @@ const show_campaigns={
                     <td>{{ Campaign.sponsor_name }}</td>
                     <td v-if="Campaign.status==='pending'"> 
                         <span class="badge bg-primary"><i class="bi bi-envelope-dash-fill"></i> Request Recieved (Pending)</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-success" @click="Accept_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-check"></i> Accept Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-success"  disabled><i class="bi bi-envelope-check"></i> Accept Request</button>
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-warning" @click="Reject_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-x"></i> Reject Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-warning" disabled ><i class="bi bi-envelope-x"></i> Reject Request</button>  
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-success btn-custom" @click="Accept_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-check"></i> Accept Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-success btn-custom"  disabled><i class="bi bi-envelope-check"></i> Accept Request</button>
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-warning btn-custom" @click="Reject_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-x"></i> Reject Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-warning btn-custom" disabled ><i class="bi bi-envelope-x"></i> Reject Request</button>  
                     </td>
 
                     <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"> <i class="bi bi-envelope-check-fill"></i> Request Accepted</span> </td>
 
                     <td v-if="Campaign.status==='rejected'"> 
                         <span class="badge bg-danger"><i class="bi bi-envelope-x-fill"></i> Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_infl(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_infl(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
                     
                     
@@ -121,16 +121,16 @@ const show_campaigns={
                     <td>{{ Campaign.sponsor_name }}</td>
                     <td v-if="Campaign.status==='pending'"> 
                         <span class="badge bg-primary"><i class="bi bi-send-dash"></i> Request Sent (Pending)</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
 
                     <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"><i class="bi bi-send-check-fill"></i> Request Accepted</span> </td>
 
                     <td v-if="Campaign.status==='rejected'"> 
                         <span class="badge bg-danger"><i class="bi bi-send-x-fill"></i> Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
                     </td>
                     
                 </tr>

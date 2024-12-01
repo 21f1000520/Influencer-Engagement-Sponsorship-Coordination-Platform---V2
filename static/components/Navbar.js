@@ -3,7 +3,7 @@
 
 const Navbar = {
   template: `
-    <nav  class="h2 navbar navbar-expand-sm navbar-dark d-flex justify-content-center" >
+    <nav  class="h2 navbar navbar-expand-sm navbar-dark " >
       <i v-if="!store.getters.getLoginState" class="bi bi-lock-fill" style="position: absolute;right: 10px;"></i>
       <i v-if="store.getters.getLoginState" class="bi bi-unlock" style="position: absolute;right: 10px;"></i>
       <div class="container-fluid d-flex justify-content-center">

@@ -37,8 +37,8 @@ const Stats = {
                                 </tbody>
                                 <tfoot class="table-success">
                                     <td colspan="5" class="h6" v-if="all_running[0].current_user_role!=='admin'"></td>
-                                    <td class="h6" v-if="all_running[0].current_user_role!=='admin'">Total Paid = </td>
-                                    <td class="h6 " v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
+                                    <td class="" v-if="all_running[0].current_user_role!=='admin'">Total Paid = </td>
+                                    <td class="" v-if="all_running[0].current_user_role!=='admin'">&#x20b9 {{ Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))}}</td>
                                 </tfoot>
                             </table>
                         </div>   
@@ -46,7 +46,7 @@ const Stats = {
                         <button type="button" v-else-if="this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
                         <span v-if='isWaiting'> Waiting... </span></div>
                         
-                        <div v-show="this.progress.length>0" class="chart-container " >
+                        <div v-show="this.progress.length>0" class="chart-container" >
                             <canvas id="myChart"></canvas>
                         </div>
                 </div>
@@ -126,45 +126,46 @@ const Stats = {
             const origin = window.location.origin;
             const url = `${origin}/start-export`;
             const res = await fetch(url, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                "Authentication-Token":sessionStorage.getItem("token"),
-            },
-            });
+                    method: "GET",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authentication-Token":sessionStorage.getItem("token"),
+                    },
+                });
             const data = await res.json()
             if (res.ok) {
                 const taskId = data['task_id']
                 console.log(taskId,'task id')
                 const intv = setInterval(async () => {
-                const url = `${origin}/download-export/${taskId}`;
-                const csv_res = await fetch(url, {
-                                    method: "GET",
-                                    headers: {
-                                        "Content-Type": "blob",
-                                        "Authentication-Token":sessionStorage.getItem("token"),
-                                    },
-                        });
-                if (csv_res.ok) {
-                    this.isWaiting = false
-                    clearInterval(intv)
-                    const blob = await csv_res.blob();
-                    // this.all_influencers = datas;
-                    console.log('success')
-                    const url = URL.createObjectURL(blob);
+                            const url = `${origin}/download-export/${taskId}`;
+                            const csv_res = await fetch(url, {
+                                                method: "GET",
+                                                headers: {
+                                                    "Content-Type": "blob",
+                                                    "Authentication-Token":sessionStorage.getItem("token"),
+                                                },
+                                    });
+                            if (csv_res.ok) {
+                                this.isWaiting = false
+                                clearInterval(intv)
+                                const blob = await csv_res.blob();
+                                // this.all_influencers = datas;
+                                console.log('success')
+                                const url = URL.createObjectURL(blob);
 
-                    // Create a temporary <a> element to trigger the download
-                    const link = document.createElement('a');
-                    link.href = url;
-                    link.download = this.all_running[0].current_user_role+'_'+this.all_running[0].current_user_name+'_'+taskId.slice(0, 5)+'.csv'; // Name of the file to be saved
-                    document.body.appendChild(link);
-                    link.click();
+                                // Create a temporary <a> element to trigger the download
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = this.all_running[0].current_user_role+'_'+this.all_running[0].current_user_name+'_'+taskId.slice(0, 5)+'.csv'; // Name of the file to be saved
+                                document.body.appendChild(link);
+                                link.click();
 
-                    // Clean up
-                    link.remove();
-                    URL.revokeObjectURL(url); // Free memory
-                }
-                }, 1000)
+                                // Clean up
+                                link.remove();
+                                URL.revokeObjectURL(url); // Free memory
+                            }
+                        },
+                    1000)
             }
             // setInterval(this.Status(task_id), 2000)
         },
@@ -203,7 +204,23 @@ const Stats = {
         CreateChart(){
             const ctx = document.getElementById('myChart');
             console.log(this.progress)
-            new Chart(ctx, 
+            console.log(window.innerWidth)
+            let w = window.innerWidth;
+            if (w<500){
+                Chart.defaults.font.size = 6;
+                
+            }else if(w>1000){
+                Chart.defaults.font.size = 16;
+                
+            }else if(w>500 && w<900){
+                Chart.defaults.font.size = 8;
+                
+            }else {
+                Chart.defaults.font.size = 12;
+
+            }
+            
+            let chart = new Chart(ctx, 
                     {
                         type: 'bar',
                         data: {

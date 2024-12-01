@@ -87,10 +87,19 @@ body {
     position: relative;
     margin: auto;
     height: 100%;
-    width: 60%;
+    width: 80%;
+    /* font-size: 1.6vw; */
     
 }
 
 #app{
     flex-wrap: nowrap;
+}
+
+.btn-custom{
+  font-size: 1.6vw;
+}
+
+.table{
+    font-size: 1.6vw;
 }

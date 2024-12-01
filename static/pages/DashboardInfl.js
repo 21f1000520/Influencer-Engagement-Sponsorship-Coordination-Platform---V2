@@ -15,20 +15,20 @@ const DashboardInfl = {
                   <div class="container" >
                     <div class="row align-items-center" >
 
-                        <div class="col-6 align-items-center rounded" style="margin-top: 1%;">
-                          <img v-bind:src="'/static/images/'+imagename" class="rounded img-fluid" alt="Profile Picture" style=" max-width: 100%; height: auto;">
+                        <div class="col-4 align-items-center rounded" style="margin-top: 0%;">
+                          <img v-bind:src="'/static/images/'+imagename" class="rounded img-fluid " alt="Profile Picture" style=" max-width: 100%; height: auto;">
                           <div class="form-container">
                             <label for = "file" class="form-label" style="margin-top:10%; font-size: 1.5vw;">Upload Profile Pic</label>
                             <input class="form-control" type="file" @change="handleFileUpload( $event )" id='file' style="font-size: 1.5vw;" />
                             <div style="margin-top:5%;">
-                              <button v-if="showupload" @click="uploadImage" class="btn btn-primary w-50" style="font-size: 2vw;">Upload</button>
-                              <button v-else class="btn btn-light w-50" style="font-size: 2vw;" disabled >Upload</button>
+                              <button v-if="showupload" @click="uploadImage" class="btn btn-primary" style="font-size: 2vw;">Upload</button>
+                              <button v-else class="btn btn-light" style="font-size: 2vw;" disabled >Upload</button>
                             </div>
                           </div>
                         </div>
 
-                        <div class="col-8 shadow-lg p-3 mb-5 bg-transparent rounded" style="margin-top: 0%; background:rgb(210, 233, 233); width:50%; border-radius: 50px;">
-                            <ul class="list-group list-group-flush bg-transparent" >
+                        <div class="col-8 shadow-lg p-3 mb-5 bg-transparent rounded" style="margin-top: 0%; background:rgb(210, 233, 233); ">
+                            <ul class="list-group list-group-flush bg-transparent" style=" border-radius: 50px; height:100%;">
                                 <li class="list-group-item display-5 bg-transparent" style="font-size: 5vw;"> {{this.user_data.fname}} {{this.user_data.lname}} </li>
                                 <li class="list-group-item  bg-transparent" style="font-size: 2.5vw;"> {{this.user_data.email}} </li>
                                 <li class="list-group-item  bg-transparent" v-if="this.user_data.role==='infl'"  style="font-size: 2vw;">
@@ -42,7 +42,7 @@ const DashboardInfl = {
                                 <li class="list-group-item h5 text-muted bg-transparent" style="columns: red; font-size: 1.5vw;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
                             </ul>
                             <div style="margin-top:5%">
-                                <a class="btn btn-outline-info h2" @click="update_profile"> Update Profile </a>
+                                <a class="btn btn-outline-info btn-custom" @click="update_profile"> Update Profile </a>
                             </div>
                         </div>
 
@@ -55,7 +55,7 @@ const DashboardInfl = {
                     <div class="col-12  justify-content-center" style="text-align: center;">
                       <button type="button" class="btn w-50" :class="{'btn-danger':!showCamps,'btn-success':showCamps}" @click="view_all_camps" style="border-radius: 26px;">View Campaigns</button>
                     
-                      <show_campaigns v-if="this.showCamps" :all_camps="all_camps" 
+                      <show_campaigns  style="font-size: 1.6vw;" v-if="this.showCamps" :all_camps="all_camps" 
                       :req_to_inf="req_to_inf" :req_to_spons="req_to_spons" :id="user_data.id"
                       @recal_sent_spons="Get_all_sent_to_spons" @recal_sent_inf="Get_all_sent_to_infl" @recal_all="Get_all_camps" />
                     </div>

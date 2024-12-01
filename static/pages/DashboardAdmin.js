@@ -65,9 +65,9 @@ const DashboardAdmin = {
                             </td>
                             <td> {{ influencer.email }} </td>
                             <td> 
-                                <button v-if="!influencer.flag" type="button" class="btn btn-warning" @click="Switch_Flag(influencer.id)"><i class="bi bi-flag"></i> Flag</button>
-                                <button v-if="influencer.flag" type="button" class="btn btn-primary"  @click="Switch_Flag(influencer.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
-                                <button type="button" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Double Click to Delete"  @dblclick="Delete(influencer.id)"><i class="bi bi-trash"></i> Delete User</button> 
+                                <button v-if="!influencer.flag" type="button" class="btn btn-warning btn-custom" @click="Switch_Flag(influencer.id)"><i class="bi bi-flag"></i> Flag</button>
+                                <button v-if="influencer.flag" type="button" class="btn btn-primary btn-custom"  @click="Switch_Flag(influencer.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
+                                <button type="button" class="btn btn-danger btn-custom" data-bs-toggle="tooltip" data-bs-placement="top" title="Double Click to Delete"  @dblclick="Delete(influencer.id)"><i class="bi bi-trash"></i> Delete User</button> 
                             </td>
 
                         </tr>
@@ -81,7 +81,7 @@ const DashboardAdmin = {
                 <div class="input-group ">
                     <input type="text" class="form-control" style="max-width:70% !important;" placeholder="Search Sponsors by Name" v-model="Search_term_spons"  >
                     <div class="input-group-btn" style="margin-left:2% !important;">
-                        <button class="btn btn-light" @click="search_spons">
+                        <button class="btn btn-light " @click="search_spons">
                             <i class="bi bi-search"></i></i> 
                         </button>
                     </div>
@@ -111,11 +111,11 @@ const DashboardAdmin = {
                             <td> {{ sponsor.email }} </td>
                             <td> {{ sponsor.industry }} </td>
                             <td> 
-                                <button v-if="!sponsor.flag" type="button" class="btn btn-warning" @click="Switch_Flag(sponsor.id)"><i class="bi bi-flag"></i> Flag</button>
-                                <button v-if="sponsor.flag" type="button" class="btn btn-primary"  @click="Switch_Flag(sponsor.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
-                                <button v-if="!sponsor.active" type="button" class="btn btn-primary" @click="Switch_active(sponsor.id)">Activate</button>
-                                <button v-if="sponsor.active" type="button" class="btn btn-info" @click="Switch_inactive(sponsor.id)">De-Activate</button>
-                                <button type="button" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Double Click to Delete"  @dblclick="Delete(sponsor.id)"><i class="bi bi-trash"></i> Delete User</button> 
+                                <button v-if="!sponsor.flag" type="button" class="btn btn-warning btn-custom" @click="Switch_Flag(sponsor.id)"><i class="bi bi-flag"></i> Flag</button>
+                                <button v-if="sponsor.flag" type="button" class="btn btn-primary btn-custom"  @click="Switch_Flag(sponsor.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
+                                <button v-if="!sponsor.active" type="button" class="btn btn-primary btn-custom" @click="Switch_active(sponsor.id)">Activate</button>
+                                <button v-if="sponsor.active" type="button" class="btn btn-info btn-custom" @click="Switch_inactive(sponsor.id)">De-Activate</button>
+                                <button type="button" class="btn btn-danger btn-custom" data-bs-toggle="tooltip" data-bs-placement="top" title="Double Click to Delete"  @dblclick="Delete(sponsor.id)"><i class="bi bi-trash"></i> Delete User</button> 
                               
                             </td>
                         </tr>
@@ -162,8 +162,8 @@ const DashboardAdmin = {
                             <td>{{ Campaign.goals }}</td>
                             <td>{{ Campaign.sponsor_name }}</td>
                             <td>
-                                <button v-if="!Campaign.flag" type="button" class="btn btn-warning" @click="Switch_Flag_camp(Campaign.id)"><i class="bi bi-flag"></i> Flag</button>
-                                <button v-if="Campaign.flag" type="button" class="btn btn-primary"  @click="Switch_Flag_camp(Campaign.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
+                                <button v-if="!Campaign.flag" type="button" class="btn btn-warning btn-custom" @click="Switch_Flag_camp(Campaign.id)"><i class="bi bi-flag"></i> Flag</button>
+                                <button v-if="Campaign.flag" type="button" class="btn btn-primary btn-custom"  @click="Switch_Flag_camp(Campaign.id)"><i class="bi bi-flag-fill"></i> Unflag</button> 
                             </td>   
                         </tr>
                     </tbody>
