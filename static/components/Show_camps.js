@@ -3,144 +3,139 @@
 const show_campaigns={
     template:`
     <div id="scrollToMe">
-     <div class="input-group">
-        <input type="text" class="form-control" style="max-width:85% !important;" placeholder="Search Campaigns by Name or Details" v-model="Search_term_camp"  >
-        <div class="input-group-btn" style="margin-left:2% !important;">
-            <button class="btn btn-light" @click="search_camp">
-                <i class="bi bi-search"></i></i> 
-            </button>
-        </div>
-        <div class="input-group-btn" style="margin-left:2% !important;">
-            <button class="btn btn-light" @click="reload_camp">
-                <i class="bi bi-arrow-clockwise"></i>
-            </button>
-        </div>
-    </div>
-
-    <div class="table-responsive">
-    <table class="table table-hover table-striped caption-top" >
-    <caption ><h1 class="display-5">Available Campaigns</h1></caption>
-            <thead class="table-primary">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Details</th>
-                    <th scope="col">Payment (Rs.)</th>
-                    <th scope="col">Goals</th>
-                    <th scope="col">Run By</th>
-                    <th scope="col">Actions</th>
-                </tr>
-            </thead>
-            <tbody v-if="untouched_camps.length>0">
-               <tr v-for="(Campaign,index) in untouched_camps" v-bind:class="{ 'table-warning': !Campaign.visibility}">
-                    <th scope="row">{{ index+1 }}</th>
-                    <td>{{ Campaign.name }}</td>
-                    <td>{{ Campaign.description }}</td>
-                    <td>{{ Campaign.budget }}</td>
-                    <td>{{ Campaign.goals }}</td>
-                    <td>{{ Campaign.sponsor_name }}</td>
-                    <td>
-                        <button type="button" class="btn btn-primary btn-custom" @click="Send_Req_to_spons(Campaign.id)"  ><i class="bi bi-send"></i> Send Request</button> 
-                    </td>
-                    
-                </tr>
-            </tbody>
-            <tbody v-else>
-                <tr> <td colspan="7"> No Campaigns Found!! </td> </tr>
-            </tbody>
-        </table>
-
-    
-     <table class="table table-hover table-striped caption-top" >
-            <caption><h1 class="display-5"> <i class="bi bi-envelope-arrow-down-fill"></i> Recieved Requests</h1></caption>
-            <thead class="table-danger">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Details</th>
-                    <th scope="col">Payment (Rs.)</th>
-                    <th scope="col">Goals</th>
-                    <th scope="col">Run By</th>
-                    <th scope="col">Status</th>
-                    
-                </tr>
-            </thead>
-            <tbody v-if="recieved_req_camp.length>0">
-               <tr v-for="(Campaign,index) in recieved_req_camp" v-bind:class="{ 'table-warning': !Campaign.visibility}">
-                    <th scope="row">{{ index+1 }}</th>
-                    <td>{{ Campaign.name }}</td>
-                    <td>{{ Campaign.description }}</td>
-                    <td>{{ Campaign.budget }}</td>
-                    <td>{{ Campaign.goals }}</td>
-                    <td>{{ Campaign.sponsor_name }}</td>
-                    <td v-if="Campaign.status==='pending'"> 
-                        <span class="badge bg-primary"><i class="bi bi-envelope-dash-fill"></i> Request Recieved (Pending)</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-success btn-custom" @click="Accept_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-check"></i> Accept Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-success btn-custom"  disabled><i class="bi bi-envelope-check"></i> Accept Request</button>
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-warning btn-custom" @click="Reject_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-x"></i> Reject Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-warning btn-custom" disabled ><i class="bi bi-envelope-x"></i> Reject Request</button>  
-                    </td>
-
-                    <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"> <i class="bi bi-envelope-check-fill"></i> Request Accepted</span> </td>
-
-                    <td v-if="Campaign.status==='rejected'"> 
-                        <span class="badge bg-danger"><i class="bi bi-envelope-x-fill"></i> Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_infl(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
-                    </td>
-                    
-                    
-                </tr>
-            </tbody>
-            <tbody v-else>
-                <tr> <td colspan="7"> No Campaigns Found!! </td> </tr>
-            </tbody>
-        </table>
-
-
-        <table class="table table-hover table-striped caption-top" >
-            <caption><h1 class="display-5"><i class="bi bi-send-fill"></i> Sent Requests</h1></caption>
-            <thead class="table-success" >
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Details</th>
-                    <th scope="col">Payment (Rs.)</th>
-                    <th scope="col">Goals</th>
-                    <th scope="col">Run By</th>
-                    <th scope="col">Status</th>
-                </tr>
-            </thead>
-            <tbody v-if="sent_req_camp.length>0">
-               <tr v-for="(Campaign,index) in sent_req_camp" v-bind:class="{ 'table-warning': !Campaign.visibility}">
-                    <th scope="row">{{ index+1 }}</th>
-                    <td>{{ Campaign.name }}</td>
-                    <td>{{ Campaign.description }}</td>
-                    <td>{{ Campaign.budget }}</td>
-                    <td>{{ Campaign.goals }}</td>
-                    <td>{{ Campaign.sponsor_name }}</td>
-                    <td v-if="Campaign.status==='pending'"> 
-                        <span class="badge bg-primary"><i class="bi bi-send-dash"></i> Request Sent (Pending)</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
-                    </td>
-
-                    <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"><i class="bi bi-send-check-fill"></i> Request Accepted</span> </td>
-
-                    <td v-if="Campaign.status==='rejected'"> 
-                        <span class="badge bg-danger"><i class="bi bi-send-x-fill"></i> Request Rejected</span> 
-                        <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
-                        <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
-                    </td>
-                    
-                </tr>
-            </tbody>
-            <tbody v-else>
-                <tr> <td colspan="7"> No Campaigns Found!! </td> </tr>
-            </tbody>
-        </table>
+        <div class="input-group">
+            <input type="text" class="form-control" style="max-width:85% !important;" placeholder="Search Campaigns by Name or Details" v-model="Search_term_camp"  >
+            <div class="input-group-btn" style="margin-left:2% !important;">
+                <button class="btn btn-light" @click="search_camp">
+                    <i class="bi bi-search"></i></i> 
+                </button>
+            </div>
+            <div class="input-group-btn" style="margin-left:2% !important;">
+                <button class="btn btn-light" @click="reload_camp">
+                    <i class="bi bi-arrow-clockwise"></i>
+                </button>
+            </div>
         </div>
 
+        <div class="table-responsive">
+            <table class="table table-hover table-striped caption-top" v-if="untouched_camps.length>0">
+                <caption ><h1 class="display-5">Available Campaigns</h1></caption>
+                <thead class="table-primary">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Payment (Rs.)</th>
+                        <th scope="col">Goals</th>
+                        <th scope="col">Run By</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody >
+                <tr v-for="(Campaign,index) in untouched_camps" v-bind:class="{ 'table-warning': !Campaign.visibility}">
+                        <th scope="row">{{ index+1 }}</th>
+                        <td>{{ Campaign.name }}</td>
+                        <td>{{ Campaign.description }}</td>
+                        <td>{{ Campaign.budget }}</td>
+                        <td>{{ Campaign.goals }}</td>
+                        <td>{{ Campaign.sponsor_name }}</td>
+                        <td>
+                            <button type="button" class="btn btn-primary btn-custom" @click="Send_Req_to_spons(Campaign.id)"  ><i class="bi bi-send"></i> Send Request</button> 
+                        </td>
+                        
+                    </tr>
+                </tbody>
+            </table>
+
+        
+            <table class="table table-hover table-striped caption-top"  v-if="recieved_req_camp.length>0">
+                <caption><h1 class="display-5"> <i class="bi bi-envelope-arrow-down-fill"></i> Recieved Requests</h1></caption>
+                <thead class="table-danger">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Payment (Rs.)</th>
+                        <th scope="col">Goals</th>
+                        <th scope="col">Run By</th>
+                        <th scope="col">Status</th>
+                        
+                    </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(Campaign,index) in recieved_req_camp" v-bind:class="{ 'table-warning': !Campaign.visibility}">
+                        <th scope="row">{{ index+1 }}</th>
+                        <td>{{ Campaign.name }}</td>
+                        <td>{{ Campaign.description }}</td>
+                        <td>{{ Campaign.budget }}</td>
+                        <td>{{ Campaign.goals }}</td>
+                        <td>{{ Campaign.sponsor_name }}</td>
+                        <td v-if="Campaign.status==='pending'"> 
+                            <span class="badge bg-primary"><i class="bi bi-envelope-dash-fill"></i> Request Recieved (Pending)</span> 
+                            <button v-if="!Campaign.flag" type="button" class="btn btn-success btn-custom" @click="Accept_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-check"></i> Accept Request</button> 
+                            <button v-if="Campaign.flag" type="button" class="btn btn-success btn-custom"  disabled><i class="bi bi-envelope-check"></i> Accept Request</button>
+                            <button v-if="!Campaign.flag" type="button" class="btn btn-warning btn-custom" @click="Reject_sent_to_infl(Campaign.req_id)" ><i class="bi bi-envelope-x"></i> Reject Request</button> 
+                            <button v-if="Campaign.flag" type="button" class="btn btn-warning btn-custom" disabled ><i class="bi bi-envelope-x"></i> Reject Request</button>  
+                        </td>
+
+                        <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"> <i class="bi bi-envelope-check-fill"></i> Request Accepted</span> </td>
+
+                        <td v-if="Campaign.status==='rejected'"> 
+                            <span class="badge bg-danger"><i class="bi bi-envelope-x-fill"></i> Request Rejected</span> 
+                            <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_infl(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                            <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        </td>
+                        
+                        
+                    </tr>
+                </tbody>
+            </table>
+
+
+            <table class="table table-hover table-striped caption-top"  v-if="sent_req_camp.length>0">
+                <caption><h1 class="display-5"><i class="bi bi-send-fill"></i> Sent Requests</h1></caption>
+                <thead class="table-success" >
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Details</th>
+                        <th scope="col">Payment (Rs.)</th>
+                        <th scope="col">Goals</th>
+                        <th scope="col">Run By</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(Campaign,index) in sent_req_camp" v-bind:class="{ 'table-warning': !Campaign.visibility}">
+                        <th scope="row">{{ index+1 }}</th>
+                        <td>{{ Campaign.name }}</td>
+                        <td>{{ Campaign.description }}</td>
+                        <td>{{ Campaign.budget }}</td>
+                        <td>{{ Campaign.goals }}</td>
+                        <td>{{ Campaign.sponsor_name }}</td>
+                        <td v-if="Campaign.status==='pending'"> 
+                            <span class="badge bg-primary"><i class="bi bi-send-dash"></i> Request Sent (Pending)</span> 
+                            <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                            <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        </td>
+
+                        <td v-if="Campaign.status==='accepted'"> <span class="badge bg-success"><i class="bi bi-send-check-fill"></i> Request Accepted</span> </td>
+
+                        <td v-if="Campaign.status==='rejected'"> 
+                            <span class="badge bg-danger"><i class="bi bi-send-x-fill"></i> Request Rejected</span> 
+                            <button v-if="!Campaign.flag" type="button" class="btn btn-danger btn-custom" @click="Delete_sent_to_spons(Campaign.req_id)" ><i class="bi bi-trash"></i> Delete Request</button> 
+                            <button v-if="Campaign.flag" type="button" class="btn btn-danger btn-custom" disabled ><i class="bi bi-trash"></i> Delete Request</button> 
+                        </td>
+                        
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div v-if="(sent_req_camp.length===0 && recieved_req_camp.length===0 && running_req_camp.length===0)" class="display-5 alert alert-danger mx-auto mt-5 rounded-pill" role="alert">
+            No Campaigns Found!!!
+
+        </div>
     </div>
     `,
 

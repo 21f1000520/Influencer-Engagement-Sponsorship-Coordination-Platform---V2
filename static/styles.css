@@ -103,3 +103,33 @@ body {
 .table{
     font-size: 1.6vw;
 }
+
+.wallet-balance {
+    margin: 20px 0;
+    background: linear-gradient(135deg, #b38c3a,#f7dca1);
+    color: white;
+    border-radius: 12px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.wallet-balance h4 {
+    font-size: 3vw;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+
+.wallet-balance h2 {
+    font-size: 4vw;
+    font-weight: bold;
+}
+
+.wallet-balance .icon {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 5vw;
+    opacity: 0.2;
+}
