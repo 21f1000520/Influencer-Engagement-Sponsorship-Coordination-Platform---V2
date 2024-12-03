@@ -467,7 +467,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
 
     @app.route('/get_all_running', methods=['GET'])
     @auth_required('token')
-    @cache.cached(timeout=30)
+    @cache.cached(timeout=5)
     def get_all_running():
         role = current_user.roles[0].name
         current_user_name = current_user.fname+' '+current_user.lname
