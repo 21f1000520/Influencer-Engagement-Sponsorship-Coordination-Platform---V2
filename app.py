@@ -33,6 +33,7 @@ def create_app():
     app.config["CACHE_TYPE"] = "RedisCache"
     app.config["CACHE_REDIS_PORT"] = 6379
 
+    cache.init_app(app)
     db.init_app(app)
 
     with app.app_context():
@@ -50,7 +51,7 @@ def create_app():
 
     entry_views.create_entery_view(app, user_datastore)
     admin_views.create_admin_views(app, user_datastore)
-    dashboard_views.create_dashboard_views(app, user_datastore)
+    dashboard_views.create_dashboard_views(app, user_datastore, cache)
     return app, user_datastore
 
 

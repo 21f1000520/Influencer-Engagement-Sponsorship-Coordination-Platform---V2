@@ -12,7 +12,7 @@ from celery.result import AsyncResult
 import math
 
 
-def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
+def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/get_current_user', methods=['GET'])
     @auth_required('token')
     def get_current_user():
@@ -467,6 +467,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore):
 
     @app.route('/get_all_running', methods=['GET'])
     @auth_required('token')
+    @cache.cached(timeout=30)
     def get_all_running():
         role = current_user.roles[0].name
         current_user_name = current_user.fname+' '+current_user.lname
