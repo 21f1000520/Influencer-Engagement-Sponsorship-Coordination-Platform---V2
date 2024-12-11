@@ -8,7 +8,7 @@ import datetime
 from models import platforms, influencer_features, sponsor_features
 
 
-def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
+def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore, cache):
 
     @app.route('/')
     def home():
@@ -16,7 +16,7 @@ def create_entery_view(app, user_datastore: SQLAlchemyUserDatastore):
 
     @app.route('/user_login', methods=['POST'])
     def user_login():
-
+        cache.clear()
         data = request.get_json()
         email = data.get('email')
         password = data.get('password')

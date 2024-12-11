@@ -1,15 +1,18 @@
+import os
 from flask import Flask
-from extentions import db, security, cache
-from create_initial_data import create_data
+
 import entry_views
 import admin_views
 import dashboard_views
-import os
+
+from create_initial_data import create_data
+from extentions import db, security, cache
 
 from celery.schedules import crontab
 from worker import celery_init_app
-import flask_excel as excel
 from tasks import pending_requests_reminder, monthly_report
+
+import flask_excel as excel
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -28,10 +31,11 @@ def create_app():
     app.config['SECURITY_LOGIN_WITHOUT_CONFIRMATION'] = True
 
     # cache config
-    app.config["DEBUG"] = True         # some Flask specific configs
     app.config["CACHE_DEFAULT_TIMEOUT"] = 300
     app.config["CACHE_TYPE"] = "RedisCache"
     app.config["CACHE_REDIS_PORT"] = 6379
+
+    app.config["DEBUG"] = True         # some Flask specific configs
 
     cache.init_app(app)
     db.init_app(app)
@@ -49,8 +53,8 @@ def create_app():
     app.config['SECURITY_CSRF_PROTECT_MECHANISHMS'] = []
     app.config['SECURITY_CSRF_IGNORE_UNAUTH_ENDPOINTS'] = True
 
-    entry_views.create_entery_view(app, user_datastore)
-    admin_views.create_admin_views(app, user_datastore)
+    entry_views.create_entery_view(app, user_datastore, cache)
+    admin_views.create_admin_views(app, user_datastore, cache)
     dashboard_views.create_dashboard_views(app, user_datastore, cache)
     return app, user_datastore
 
@@ -73,4 +77,4 @@ def schedule_tasks(sender, **kwargs):
 
 if __name__ == "__main__":
     # app.run(debug=True)
-    app.run(host='0.0.0.0', port='7000', debug=True, threaded=False)
+    app.run(host='0.0.0.0', port='7000', debug=True)

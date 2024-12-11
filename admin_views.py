@@ -1,14 +1,14 @@
 from flask import jsonify, render_template, render_template_string, request, send_file
 from flask_security import auth_required, current_user, roles_required, roles_accepted, SQLAlchemyUserDatastore
 from flask_security.utils import hash_password, verify_password
-from extentions import db, cache
+from extentions import db
 from helper_functions import get_or_create, get_or_create_features
 import datetime
 
 from models import influencer_features, sponsor_features, campaigns, recieved_ad_req, recieved_infl_req
 
 
-def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
+def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/users/<role>', methods=['GET'])
     @roles_accepted('admin', 'spons')
     def get_users(role):
@@ -154,6 +154,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore):
     @app.route('/delete_user/<id>', methods=['DELETE'])
     @roles_required('admin')
     def delete_user(id):
+        cache.clear()
         user = user_datastore.find_user(id=id)
         role = user.roles[0].name
         try:

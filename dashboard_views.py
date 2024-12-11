@@ -73,6 +73,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @auth_required('token')
     def update_user():
         print(current_user)
+        cache.clear()
         data = request.get_json()
         fname = data.get('fname')
         lname = data.get('lname')
@@ -167,6 +168,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/delete_campaigns/<id>', methods=['DELETE'])
     @roles_required("spons")
     def delete_campaigns(id):
+        cache.clear()
         SpF = db.session.query(
             sponsor_features).filter_by(user_id=current_user.id).first()
         camp_del = campaigns.query.filter(
@@ -196,6 +198,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/update_campaigns/<id>', methods=['PUT'])
     @roles_required("spons")
     def update_campaigns(id):
+        cache.clear()
         print('update campaign')
         SpF = db.session.query(
             sponsor_features).filter_by(user_id=current_user.id).first()
@@ -384,6 +387,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/delete_req_to_spons/<id>', methods=['DELETE'])
     @auth_required('token')
     def delete_to_spons(id):
+        cache.clear()
         target_req = recieved_infl_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -398,6 +402,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/delete_req_to_infl/<id>', methods=['DELETE'])
     @auth_required('token')
     def delete_to_infl(id):
+        cache.clear()
         target_req = recieved_ad_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -412,6 +417,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/accept_req_to_spons/<id>', methods=['GET'])
     @roles_accepted("spons")
     def accept_to_spons(id):
+        cache.clear()
         target_req = recieved_infl_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -426,6 +432,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/reject_req_to_spons/<id>', methods=['GET'])
     @roles_accepted("spons")
     def reject_to_spons(id):
+        cache.clear()
         target_req = recieved_infl_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -440,6 +447,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/accept_req_to_infl/<id>', methods=['GET'])
     @roles_accepted("infl")
     def accept_to_infl(id):
+        cache.clear()
         target_req = recieved_ad_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -454,6 +462,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/reject_req_to_infl/<id>', methods=['GET'])
     @roles_accepted("infl")
     def reject_to_infl(id):
+        cache.clear()
         target_req = recieved_ad_req.query.filter_by(id=id).first()
         if not target_req:
             return jsonify({"message": "No such request"}), 404
@@ -467,7 +476,7 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
 
     @app.route('/get_all_running', methods=['GET'])
     @auth_required('token')
-    @cache.cached(timeout=5)
+    @cache.cached(timeout=50)
     def get_all_running():
         role = current_user.roles[0].name
         current_user_name = current_user.fname+' '+current_user.lname
