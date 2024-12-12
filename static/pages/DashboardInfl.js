@@ -3,11 +3,9 @@ import show_campaigns from "../components/Show_camps.js";
 
 const DashboardInfl = {
   template: `
-            <div class="row d-flex justify-content-center">
+            <div class="row d-flex justify-content-center appear">
               <div class="col-9  justify-content-center" style="text-align: center;">
-                <div class="badge rounded-pill px-4 py-0" style="background: rgb(177, 116, 87); margin-bottom:5%"><h1 class="display-5">{{this.user_data.fname}} {{this.user_data.lname}}</h1></div>
-                
-                
+               
                 <div v-if="this.flagged" class="alert alert-danger" role="alert"> 
                   <h1>You Have been Flagged by Admin, contact Admin!!!</h1>
                 </div>

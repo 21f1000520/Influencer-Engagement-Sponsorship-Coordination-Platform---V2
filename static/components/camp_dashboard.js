@@ -2,7 +2,7 @@
 const camp_dashboard={
     template:`
     <div class="popup" @click.self="$emit('ClosePopup')"> 
-        <div class="popup-inner shadow-lg" style="max-width: 1920px; max-height: 100%;">
+        <div class="popup-inner shadow-lg" style="max-width: 100%;" >
 
             <form class="row g-3">
                 <div class="col-4">

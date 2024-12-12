@@ -1,6 +1,7 @@
 body {
     /* background: linear-gradient(to right, #f7ba57, #a6fffb); */
     background-color: #E4E0E1;
+    /* overflow: hidden; */
 }
 
 .nav-item{
@@ -12,13 +13,27 @@ body {
     background-color: #D6C0B3;
 }
 
+.btn-bg-custom{
+    background-color: #f1ab75b9;
+    border-color: #f1ab75b1 ;
+    border-width: 0;
+}
+
+.custom-active {
+    transform:translateY(-0.2em);
+    /* border-radius: 50px; */
+    color: #FFF !important;
+    background-color: #b55e1bb2 !important;
+    border-color: #b55e1b !important;
+    border-width: 0;
+}
+
+
 #email_validation,#plateform_validation,#loginError{
     color: rgb(255, 0, 0);
 }
 
-#nav a.router-link-exact-active {
-    color: #42b983;
-}
+
 
 .block {
     width: 50%;
@@ -43,16 +58,26 @@ body {
 
 .btn{
     margin: 3%;
-    transition: all 0.2s ease;
+    transition: all 0.4s ease;
+    
 }
 
-button{
-    transition: all 0.2s ease;
 
+.btn:hover{
+    transform: translateY(-0.2em);
 }
 
-button.active{
-    transform: scale(0.96);
+.btn:active{
+    transform: scale(0.7);
+}
+
+
+.moveUP{
+    transition: all 0.4s ease;
+    
+}
+.moveUP:hover{
+    transform: translateY(-0.2em)
 }
 
 
@@ -62,34 +87,27 @@ button.active{
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 99;
+    z-index: 10;
     background-color: rgba(0, 0, 0, 0.45);
-    
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 10;
+    
     .popup-inner {
         background: #FFF;
         padding: 25px;
-        overflow: scroll;
+        overflow: auto;
         max-height: 500px;
         max-width: 500px;
         z-index: 20;
+        border-radius: 20px;
 
     }
 
 }
-/* 
-.bt-custom-login{
-    background-color: #B17457;
-    border-color: #B17457;
-}
 
-.bt-custom-dashboard{
-    background-color: #ECB176;
-    border-color: #ECB176;
-     */
+
+
 .bg-custom{
     background-color: rgb(255, 112, 112);
 }
@@ -114,6 +132,7 @@ button.active{
 .table{
     font-size: 1.6vw;
 }
+
 
 .wallet-balance {
     margin: 20px 0;
@@ -143,4 +162,68 @@ button.active{
     right: 15px;
     font-size: 5vw;
     opacity: 0.2;
+}
+
+
+@keyframes slide {
+    0%{
+        transform: translateY(-100px);
+       
+    }
+
+    30%{
+        transform: translateY(0px);
+    }
+
+
+}
+
+
+.slide{
+    animation-name: slide;
+    animation-duration: 2s;
+    animation-fill-mode:none;
+  
+}
+
+
+@keyframes appear {
+    0%{
+        opacity: 0;
+        transform: translateY(-30px);
+       
+    }
+
+    25%{transform: translateY(0px);}
+    
+
+    100%{
+        opacity: 1;
+    }
+
+
+}
+
+
+.appear{
+    animation-name: appear;
+    animation-duration: 3s;
+    /* animation-fill-mode: both; */
+  
+}
+
+
+
+
+
+.disappear{
+    animation-name: appear;
+    animation-duration: 0.1s;
+    animation-fill-mode: both;
+    animation-direction: reverse;
+  
+}
+
+.list-group .display-5{
+    color: #a39288;
 }

@@ -2,8 +2,8 @@ import router from "../utils/router.js";
 
 const UpdateUser = {
   template: `
-    <div class="d-flex justify-content-center align-items-center vh-500">
-      <div class="card shadow p-4">
+    <div class="d-flex justify-content-center align-items-center appear">
+      <div class="card shadow p-4  w-30">
         <h3 class="card-title text-center mb-4">Update Profile</h3>
         <div class="form-group mb-3">
           <label for="email" class="form-label">Email address*</label>

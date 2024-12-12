@@ -16,37 +16,51 @@ import Stats from "../pages/Stats.js";
 
 const routes = [
   { path: "/", 
+    name: "/",
     component: Login,
     meta:{requiresLogout:true}, 
   },
 
-  { path: "/login", component: Login, meta:{requiresLogout:true},  },
-  { path: "/register", component: Register,meta:{requiresLogout:true},  },
+  { path: "/login", 
+    name: "login",
+    component: Login, 
+    meta:{requiresLogout:true},  
+  },
+  { path: "/register", 
+    name: "register",
+    component: Register,
+    meta:{requiresLogout:true},  
+  },
 //   { path: "/logout", component: Logout },
   {
     path: "/dashboard-infl",
+    name: "dashboard-infl",
     component: DashboardInfl,
     meta: { requiresLogin: true, role: "infl" },
   },
 
   {
     path: "/dashboard-spons",
+    name: "dashboard-spons",
     component: DashboardSpons,
     meta: { requiresLogin: true, role: "spons" },
   },
 
   {
     path: "/dashboard-admin",
+    name: "dashboard-admin",
     component: DashboardAdmin,
     meta: { requiresLogin: true, role: "admin" },
   },
   {
     path: "/update-user",
+    name: "update-user",
     component: UpdateUser,
     meta: { requiresLogin: true },
   },
   {
     path: "/add_campaign",
+    name: "add_campaign",
     component: AddCamp,
     meta: { requiresLogin: true, role: "spons" },
   },

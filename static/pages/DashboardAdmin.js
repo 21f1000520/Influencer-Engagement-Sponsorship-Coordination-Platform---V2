@@ -1,6 +1,6 @@
 const DashboardAdmin = {
   template: `
-        <div class="row d-flex justify-content-center">
+        <div class="row d-flex justify-content-center appear">
             <div class="col-8  justify-content-center" style="text-align: center;">
             <div class="badge rounded-pill px-4 py-0" style="background: #859F3D; margin-bottom:5%"><h1 class="display-5">Welcome Admin</h1></div>
                 

@@ -4,7 +4,7 @@ import UpdateCamp from "./Update_campaign.js";
 
 const campaign={
     template:`
-    <div>
+    <div  >
         <div :class="'row row-cols-'+camps.length+'g-3'">
             <div v-for="camp in camps" class="col">
                 <div class="card text-dark shadow-lg" v-bind:class="{ 'bg-light': (camp.visibility && !camp.flag), 'bg-warning': (!camp.visibility && !camp.flag) ,'bg-custom':camp.flag}">
@@ -21,7 +21,7 @@ const campaign={
                         <button class="btn btn-info shadow" style="border-radius: 16px;" @click="view_camp(camp.id)" ><i class="bi bi-view-list"></i> View</button>
                         
                         <button class="btn btn-primary shadow" style="border-radius: 16px;" @click="update_camp(camp.id)" ><i class="bi bi-cloud-arrow-up"></i> Update</button>
-                        <button class="btn btn-danger shadow" style="border-radius: 16px;" @click="delete_camp(camp.id)"><i class="bi bi-trash"></i> Delete</button>
+                        <button class="btn btn-danger shadow" style="border-radius: 16px;" @dbclick="delete_camp(camp.id)" @click="this.alert('double click to delete')"><i class="bi bi-trash"></i> Delete</button>
                     </div>
 
                     <div class="card-footer alert alert-danger" role="alert" v-else>
@@ -32,12 +32,12 @@ const campaign={
             </div>
         </div>
         <div v-if="this.popup_update"> 
-            <UpdateCamp :id="popup_updateId"  @ClosePopup="Close" @reload_camps_data="Send_signal_reload"/> 
+            <UpdateCamp :id="popup_updateId"  @ClosePopup="Close" @reload_camps_data="Send_signal_reload" class='slide'/> 
         </div>
 
         <div v-if="this.popup_view"> 
-            <camp_dashboard :id="popup_updateId" :sent_reqs="sent_reqs" :recieved_reqs="recieved_reqs" :all_influencers="all_influencers"  
-                @ClosePopup="Close" @recal_sent_inf="Get_all_sent_to_infl" @recal_sent_spons="Get_all_sent_to_spons" @recal_all_inf="Get_all_infls"/> 
+            <camp_dashboard class='slide' :id="popup_updateId" :sent_reqs="sent_reqs" :recieved_reqs="recieved_reqs" :all_influencers="all_influencers"  
+                @ClosePopup="Close" @recal_sent_inf="Get_all_sent_to_infl" @recal_sent_spons="Get_all_sent_to_spons" @recal_all_inf="Get_all_infls" /> 
         </div>
     </div>
     `,
@@ -75,6 +75,7 @@ const campaign={
 
         view_camp(id){
             console.log('view campaign',id);
+            
             this.popup_updateId=id;
             this.popup_view=true;
             this.$emit("blurr")

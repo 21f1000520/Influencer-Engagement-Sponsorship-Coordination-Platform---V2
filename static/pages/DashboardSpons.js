@@ -6,7 +6,7 @@ import campaign from "../components/Campaign_view.js";
 const DashboardSpons = {
 
 
-  template: `<div class="row d-flex justify-content-center" >
+  template: `<div class="row d-flex justify-content-center align-items-center appear" >
                 <div class="col-8  justify-content-center" style="text-align: center;">
                     <div class="badge rounded-pill px-4 py-0 shadow" style="background: rgb(255, 178, 111); margin-bottom:5%"><h1 class="display-5">{{this.user_data.fname}} {{this.user_data.lname}}</h1></div>
                     <div v-if="this.flagged" class="alert alert-danger" role="alert"> 

@@ -1,7 +1,7 @@
 import wallet from "../components/wallet.js";
 
 const Stats = {
-    template: `<div class="row d-flex justify-content-center">
+    template: `<div class="row d-flex justify-content-center appear">
                     <div class="col-8  justify-content-center" style="text-align: center;">
                         
                         <div class="table-responsive">
@@ -46,7 +46,7 @@ const Stats = {
                             </table>
                         </div>
                         
-                        <wallet  v-if="this.current_user_role==='infl'" :balance="Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))"/>
+                        <wallet class="moveUP" v-if="this.current_user_role==='infl'" :balance="Math.round(payment.reduce((partialSum, a) => partialSum + a, 0))"/>
                       
 
                         <button type="button" v-if="!this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>

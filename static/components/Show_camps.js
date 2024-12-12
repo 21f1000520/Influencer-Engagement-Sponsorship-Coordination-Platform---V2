@@ -133,7 +133,7 @@ const show_campaigns={
         </div>
 
         <div v-if="(sent_req_camp.length===0 && recieved_req_camp.length===0 && running_req_camp.length===0)" class="display-5 alert alert-danger mx-auto mt-5 rounded-pill" role="alert">
-            No Campaigns Found!!!
+            No Ad Requests are available yet!!
 
         </div>
     </div>
