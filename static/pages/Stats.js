@@ -33,7 +33,7 @@ const Stats = {
                                         <td v-if="Campaign.current_user_role!=='spons' && !Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Campaign.sponsor_name }}</td>
                                         <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role!=='admin' " colspan="5" class="h6"  > Flagged By Admin!!! </td>
                                         <td v-if="(Campaign.flag || Campaign.influencer_flag || Campaign.sponsor_flag) && Campaign.current_user_role==='admin' " colspan="5" class="h6"  > Flagged By Admin!!! </td>
-                                        <td v-if="!Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag"> {{Math.round(progress[index]*100)/100}} </td>
+                                        <td v-if="!Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag"> {{Math.round(progress[index]*100)/100}}</td>
                                         <td v-if="Campaign.current_user_role!=='admin' && !Campaign.flag && !Campaign.influencer_flag && !Campaign.sponsor_flag">{{ Math.round(payment[index]) }}</td>
                                     </tr>
 
@@ -76,7 +76,8 @@ const Stats = {
             task_id:"",
             isWaiting: false,
             networkError:false,
-            current_user_role:""
+            current_user_role:"",
+            temp_index:0,
         }
     },
 
@@ -99,6 +100,7 @@ const Stats = {
 
 
     methods:{
+        Increment_temp(){this.temp_index=this.temp_index+1},
 
         Get_plot_data(){
             let prg=[]
@@ -107,6 +109,15 @@ const Stats = {
             for (let i=0;i<this.all_running.length;i++){
                 let camp=this.all_running[i]
                 if (camp.flag || camp.influencer_flag || camp.sponsor_flag){
+                    prg.push(undefined)
+                     if (this.current_user_role==='infl'){
+
+                    lb.push(camp.name)
+                }else if (this.current_user_role==='spons'){
+                    lb.push('# '+(i+1))
+                }else{
+                    lb.push('# '+(i+1))
+                }
                     continue;
                 }
                 // console.log(camp.start_date,camp.end_date);
@@ -117,10 +128,11 @@ const Stats = {
                 let spent = ms_now-start.getTime()
                 let frac = spent/length*100
                 // console.log(length,'duration',ms_now,'now',spent,'spent',frac,'frac',start.getTime(),'start')
-                // console.log(frac,camp.name)
+                console.log(frac,camp.name)
                 if (frac>=100){
                     pay.push(camp.budget)
                     prg.push(100)
+                    // console.log('entered',camp.name)
                 }else{
                     pay.push(camp.budget*Math.floor(frac/10)/10)
                     // console.log(camp.budget*Math.floor(frac/10)/10)
@@ -261,15 +273,26 @@ const Stats = {
                 Chart.defaults.font.size = 12;
 
             }
-            
+            let filteredLabels=[]
+            let filteredProg=[]
+            for (let index = 0; index < this.progress.length; index++) {
+                const element = this.progress[index];
+                const lb = this.labels[index];
+                // console.log(element!==undefined,element)
+                if (element!==undefined) {
+                    filteredProg.push(element)
+                    filteredLabels.push(lb)
+                }
+            }
+
             let chart = new Chart(ctx, 
                     {
                         type: 'bar',
                         data: {
-                            labels: this.labels,
+                            labels: filteredLabels,
                             datasets: [{
                                 label: 'Progress (%)',
-                                data: this.progress,
+                                data: filteredProg,
                                 borderColor: '#D6C0B3',
                                 backgroundColor: '#AB886D',
                                 borderWidth: 1,

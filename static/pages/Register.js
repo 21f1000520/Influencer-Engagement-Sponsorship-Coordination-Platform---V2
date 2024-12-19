@@ -12,7 +12,7 @@ const Register = {
         <div id="email_validation" v-if="!isValidEmail">Email is {{isValidEmail ? 'valid' : 'invalid'}}</div>
         <div class="form-group mb-4">
           <label for="password" class="form-label">Password*</label>
-          <input v-model="password" type="password" class="form-control" placeholder="Password" id="password" required/>
+          <input v-model="password" type="password" class="form-control" placeholder="Password" id="password"  maxlength="12" required/>
           <div v-if="this.password.length<4" id="plateform_validation">Password length should be atleast 4</div>
         </div>
         <div class="form-group mb-4">
