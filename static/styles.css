@@ -26,11 +26,17 @@ body {
     border-color: #f1ab75b1;
     border-width: 0;
     width: 100px;
+    --bs-btn-hover-color: var(--bs-white);
+    --bs-btn-hover-bg: #b55e1bb2;
 }
+
+
 
 .btn-rest {
     background-color: #f1ab75b9;
     border-width: 0;
+    --bs-btn-hover-color: var(--bs-white);
+    --bs-btn-hover-bg: #e17a2cb2;
 }
 
 .custom-active {

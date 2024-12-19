@@ -2,8 +2,8 @@ import router from "../utils/router.js";
 
 const Register = {
   template: `
-    <div class="d-flex justify-content-center align-items-center vh-500 appear">
-      <div class="card shadow p-4">
+    <div class="d-flex justify-content-center align-items-center appear">
+      <div class="card shadow p-4  border-0 rounded-3 w-50">
         <h3 class="card-title text-center mb-4">Sign Up</h3>
         <div class="form-group mb-3">
           <label for="email" class="form-label">Email address*</label>
@@ -50,8 +50,14 @@ const Register = {
           <input  v-model="industry" class="form-control" id="industry" type="text" required/>
           <div v-if="this.industry.length===0" id="plateform_validation">Enter Industry</div>
         </div>
+         <div id = "loginError" class="form-group alert alert-danger py-1"  v-show="this.alreadyExists"> 
+              <i class="bi bi-exclamation-triangle-fill"></i> User Already Exists!!
+              Enter different Email
+        </div>
 
-        <button class="btn btn-primary w-100" @click="click_submit">Submit</button>
+        <div class="form-group mb-4 d-flex justify-content-center" >
+        <button class="btn btn-primary w-50 d-flex justify-content-center" @click="click_submit">Submit</button>
+        </div>
       </div>
     </div>
   `,
@@ -69,6 +75,7 @@ const Register = {
       error_plateform:"",
       error_role:"",
       error_password:"",
+      alreadyExists:false,
     };
   },
 
@@ -190,8 +197,13 @@ computed: {
         if (res.ok) {
           const data = await res.json();
           console.log(data);
-          // Handle successful sign up, e.g., redirect or store token
-          router.push("/login");
+          if (data.message==="user already exists"){
+            this.alreadyExists=true;
+            setTimeout(() => this.alreadyExists = false, 5000)
+          }else{
+            // Handle successful sign up, e.g., redirect or store token
+            router.push("/login");
+          }
         } else {
           const errorData = await res.json();
           console.error("Sign up failed:", errorData);

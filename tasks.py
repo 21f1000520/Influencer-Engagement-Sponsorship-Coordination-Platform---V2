@@ -125,6 +125,7 @@ def get_all_running_dic(role, id):
 
 @shared_task(ignore_result=False)
 def export_csv(role, id):
+    time.sleep(2)
     dic = get_all_running_dic(role, id)
     if role == 'spons':
         columns = ['name', 'description',

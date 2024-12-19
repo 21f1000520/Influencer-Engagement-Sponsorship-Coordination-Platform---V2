@@ -50,8 +50,11 @@ const Stats = {
                       
 
                         <button type="button" v-if="!this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;">Download CSV file</button>
-                        <button type="button" v-else-if="this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger" @click="download_csv" style="border-radius: 26px;" disabled>Download CSV file</button>
-                        <span v-if='isWaiting'> Waiting... </span></div>
+                        <button type="button" v-else-if="this.isWaiting && this.all_running.length>0" class="btn w-50 btn-danger placeholder-wave col-4" @click="download_csv" style="border-radius: 26px;" disabled>
+                            <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                            <span role="status">Loading...</span>
+                        </button>
+                        
                         
                         <div v-show="this.progress.length>0" class="chart-container" >
                             <canvas id="myChart"></canvas>

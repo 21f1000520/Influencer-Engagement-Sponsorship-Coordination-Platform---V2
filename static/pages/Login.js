@@ -3,7 +3,7 @@ import router from "../utils/router.js";
 const Login = {
   template: `
     <div class="d-flex justify-content-center align-items-center vh-100 appear">
-      <div class="card shadow p-4 border rounded-3 ">
+      <div class="card shadow p-4 border rounded-3 w-35">
         <h3 class="card-title text-center mb-4">Login</h3>
         <div class="form-group mb-3">
           <input v-model="email" type="email" class="form-control" placeholder="Email" required/>
@@ -11,9 +11,15 @@ const Login = {
         <div class="form-group mb-4">
           <input v-model="password" type="password" class="form-control" placeholder="Password" required/>
         </div>
-        <div id = "loginError" class="form-group mb-4"  v-if="this.notFound"> No Such User Exist </div>
-        <div id = "loginError" class="form-group mb-4"  v-if="this.wrongPass"> Wrong Password </div>
-        <div id = "loginError" class="form-group mb-4"  v-if="this.notActive"> User must be activated first by the Admin </div>
+        <div class="form-group alert alert-danger py-1"  v-show="this.notFound" role="alert"> 
+              <i class="bi bi-exclamation-triangle-fill"></i> No Such User Exist 
+        </div>
+        <div id = "loginError" class="form-group alert alert-danger py-1"  v-show="this.wrongPass">
+          <i class="bi bi-exclamation-triangle-fill"></i> Wrong Password 
+        </div>
+        <div id = "loginError" class="form-group alert alert-danger py-1"  v-show="this.notActive"> 
+              <i class="bi bi-exclamation-triangle-fill"></i> User must be activated first by the Admin 
+        </div>
 
         <button class="btn btn-primary w-100" @click="submitInfo">Log In</button>
        

@@ -4,16 +4,18 @@
 const Navbar = {
   template: `
     <nav  class="h2 navbar navbar-expand-sm navbar-dark " >
+
       <i v-if="!store.getters.getLoginState" class="bi bi-lock-fill" style="position: absolute;right: 10px; top:15px"></i>
       <i v-if="store.getters.getLoginState" class="bi bi-unlock" style="position: absolute;right: 10px; top:15px"></i>
-      
       <img src="/static/images/favicon_sni.png" alt="" width="50" height="50" style="position: absolute;left: 10px; top:10px">
+      
+      
       <div class="container-fluid d-flex justify-content-center gap-5">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="mx-auto collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mx-auto">
+            <ul class="navbar-nav  mx-auto">
                 <li class="nav-item"  v-if="!store.getters.getLoginState"  >
                     <router-link to="/login" ><button type="button" class="btn btn-bg-custom shadow" :class='{"custom-active":this.$route.name==="login"}'>Login</button></router-link>
                 </li>
