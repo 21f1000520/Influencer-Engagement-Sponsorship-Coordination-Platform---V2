@@ -40,7 +40,7 @@ const DashboardInfl = {
                                 <li class="list-group-item h5 text-muted bg-transparent" style="columns: red; font-size: 1.5vw;" v-if="this.user_data.role==='infl'">{{this.user_data.aboutMe}}</li>
                             </ul>
                             <div style="margin-top:5%">
-                                <a class="btn btn-outline-info btn-custom" @click="update_profile"> Update Profile </a>
+                                <a class="btn btn-outline btn-rest btn-custom" @click="update_profile"> Update Profile </a>
                             </div>
                         </div>
 
@@ -62,29 +62,29 @@ const DashboardInfl = {
               </div>
             </div>
             `,
-  data(){
-     return {
-      flagged:false,
-      user_data:{},
-      imagename:"sample.jpg",
-      file:null,
-      filename:null,
-      showupload:false,
-      showCamps:false,
-      all_camps:[],
-      req_to_inf:[],
-      req_to_spons:[],
-     }
+  data() {
+    return {
+      flagged: false,
+      user_data: {},
+      imagename: "sample.jpg",
+      file: null,
+      filename: null,
+      showupload: false,
+      showCamps: false,
+      all_camps: [],
+      req_to_inf: [],
+      req_to_spons: [],
+    }
   },
 
-  async beforeMount(){
+  async beforeMount() {
     console.log('before mount')
     this.Get_all_camps();
     this.Get_all_sent_to_infl();
     this.Get_all_sent_to_spons();
   },
 
-  async mounted(){
+  async mounted() {
     console.log('mounted')
     const origin = window.location.origin;
     const url = `${origin}/get_current_user`;
@@ -92,147 +92,146 @@ const DashboardInfl = {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "Authentication-Token":sessionStorage.getItem("token"),
+        "Authentication-Token": sessionStorage.getItem("token"),
       },
     });
-    if (res.ok){
-          const datas = await res.json();
-          // this.all_influencers = datas;
-          console.log(datas);
-          this.flagged=datas.flag;
-          this.user_data=datas;
-          console.log(this.user_data,'user data')
+    if (res.ok) {
+      const datas = await res.json();
+      // this.all_influencers = datas;
+      console.log(datas);
+      this.flagged = datas.flag;
+      this.user_data = datas;
+      console.log(this.user_data, 'user data')
 
-        }else if(res.status===403 || res.status===401){
-            console.error("Forbidden Request");
-            sessionStorage.clear()
-                this.$store.commit("logout");
-                this.$store.commit("setRole", null);
-            this.$router.push("/login");
-            this.$router.go()
-      }else {
+    } else if (res.status === 403 || res.status === 401) {
+      console.error("Forbidden Request");
+      sessionStorage.clear()
+      this.$store.commit("logout");
+      this.$store.commit("setRole", null);
+      this.$router.push("/login");
+      this.$router.go()
+    } else {
       const errorData = await res.json();
       console.error("No current user:", errorData);
     }
 
-    if (this.user_data.dp_name){
+    if (this.user_data.dp_name) {
       console.log(this.user_data.dp_name);
-      this.imagename=this.user_data.dp_name;
+      this.imagename = this.user_data.dp_name;
     }
   },
 
-  methods:{
-    async Get_all_sent_to_infl(){
-        const origin = window.location.origin;
-        const url = `${origin}/get_all_req_to_inf`;
-        const res = await fetch(url, {
+  methods: {
+    async Get_all_sent_to_infl() {
+      const origin = window.location.origin;
+      const url = `${origin}/get_all_req_to_inf`;
+      const res = await fetch(url, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json",
-            "Authentication-Token":sessionStorage.getItem("token"),
+          "Content-Type": "application/json",
+          "Authentication-Token": sessionStorage.getItem("token"),
         },
-        });
-        if (res.ok){
-            const datas = await res.json();
-            // this.all_influencers = datas;
-            console.log(datas,'sent to infl');
-            this.req_to_inf=datas;
-            
-        }else if(res.status===403 || res.status===401){
-            console.error("Forbidden Request");
-            sessionStorage.clear()
-                this.$store.commit("logout");
-                this.$store.commit("setRole", null);
-            this.$router.push("/login");
-            this.$router.go()
-      }else {
+      });
+      if (res.ok) {
+        const datas = await res.json();
+        // this.all_influencers = datas;
+        console.log(datas, 'sent to infl');
+        this.req_to_inf = datas;
+
+      } else if (res.status === 403 || res.status === 401) {
+        console.error("Forbidden Request");
+        sessionStorage.clear()
+        this.$store.commit("logout");
+        this.$store.commit("setRole", null);
+        this.$router.push("/login");
+        this.$router.go()
+      } else {
         const errorData = await res.json();
         console.error("No requests to infl", errorData);
-        }
+      }
     },
-    async Get_all_sent_to_spons(){
-        const origin = window.location.origin;
-        const url = `${origin}/get_all_req_to_spons`;
-        const res = await fetch(url, {
+    async Get_all_sent_to_spons() {
+      const origin = window.location.origin;
+      const url = `${origin}/get_all_req_to_spons`;
+      const res = await fetch(url, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json",
-            "Authentication-Token":sessionStorage.getItem("token"),
+          "Content-Type": "application/json",
+          "Authentication-Token": sessionStorage.getItem("token"),
         },
-        });
-        if (res.ok){
-            const datas = await res.json();
-            // this.all_influencers = datas;
-            console.log(datas);
-            this.req_to_spons=datas;
-            
-        }else {
+      });
+      if (res.ok) {
+        const datas = await res.json();
+        // this.all_influencers = datas;
+        console.log(datas);
+        this.req_to_spons = datas;
+
+      } else {
         const errorData = await res.json();
         console.error("No requests recieved to sponsor", errorData);
-        }
+      }
     },
 
 
-    async Get_all_camps(){
-        const origin = window.location.origin;
-        const url = `${origin}/get_all_campaigns`;
-        const res = await fetch(url, {
+    async Get_all_camps() {
+      const origin = window.location.origin;
+      const url = `${origin}/get_all_campaigns`;
+      const res = await fetch(url, {
         method: "GET",
         headers: {
-            "Content-Type": "application/json",
-            "Authentication-Token":sessionStorage.getItem("token"),
+          "Content-Type": "application/json",
+          "Authentication-Token": sessionStorage.getItem("token"),
         },
-        });
-        if (res.ok){
-            const datas = await res.json();
-            // this.all_influencers = datas;
-            console.log(datas);
-            this.all_camps=datas;
-            
-        }else if(res.status===403 || res.status===401){
-            console.error("Forbidden Request");
-            sessionStorage.clear()
-                this.$store.commit("logout");
-                this.$store.commit("setRole", null);
-            this.$router.push("/login");
-            this.$router.go()
-      }else {
+      });
+      if (res.ok) {
+        const datas = await res.json();
+        // this.all_influencers = datas;
+        console.log(datas);
+        this.all_camps = datas;
+
+      } else if (res.status === 403 || res.status === 401) {
+        console.error("Forbidden Request");
+        sessionStorage.clear()
+        this.$store.commit("logout");
+        this.$store.commit("setRole", null);
+        this.$router.push("/login");
+        this.$router.go()
+      } else {
         const errorData = await res.json();
         console.error("No campaigns", errorData);
-        }
+      }
     },
 
 
 
 
-    validateFile(filename){
+    validateFile(filename) {
       let allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
-      
+
       if (!allowedExtensions.exec(filename)) {
         alert('Invalid file type');
         return false;
-      } 
-      else 
-      {
+      }
+      else {
         return true;
       }
     },
-    
-    async update_profile(){
+
+    async update_profile() {
       console.log('update profile')
       this.$router.push("/update-user")
 
     },
-    handleFileUpload( e ){
+    handleFileUpload(e) {
       this.file = e.target.files[0];
-      let extention = this.file.name.substring(this.file.name.lastIndexOf('.')+1, this.file.name.length) || this.file.name;
-      console.log(this.file.name,extention)
-      if  (this.validateFile(this.file.name)){
-        this.showupload=true;
-        this.filename = this.user_data.fname+'_'+this.user_data.id+'.'+extention
+      let extention = this.file.name.substring(this.file.name.lastIndexOf('.') + 1, this.file.name.length) || this.file.name;
+      console.log(this.file.name, extention)
+      if (this.validateFile(this.file.name)) {
+        this.showupload = true;
+        this.filename = this.user_data.fname + '_' + this.user_data.id + '.' + extention
         console.log(this.filename)
       }
-            
+
     },
 
     async uploadImage() {
@@ -250,36 +249,36 @@ const DashboardInfl = {
       const res = await fetch(url, {
         method: "POST",
         headers: {
-          "Authentication-Token":sessionStorage.getItem("token"),
+          "Authentication-Token": sessionStorage.getItem("token"),
         },
         body: formData,
-        });
+      });
 
-      if (res.ok){
+      if (res.ok) {
         const response = await res.json();
         console.log(response);
         this.$router.go();
-    }else if(res.status===403 || res.status===401){
-            console.error("Forbidden Request");
-            sessionStorage.clear()
-                this.$store.commit("logout");
-                this.$store.commit("setRole", null);
-            this.$router.push("/login");
-            this.$router.go()
+      } else if (res.status === 403 || res.status === 401) {
+        console.error("Forbidden Request");
+        sessionStorage.clear()
+        this.$store.commit("logout");
+        this.$store.commit("setRole", null);
+        this.$router.push("/login");
+        this.$router.go()
 
-      }else {
-      const errorData = await res.json();
-      console.error("could not upload:", errorData);
-      
-    }
+      } else {
+        const errorData = await res.json();
+        console.error("could not upload:", errorData);
+
+      }
     },
 
-    view_all_camps(){
+    view_all_camps() {
       console.log('view camps')
-      this.showCamps=!this.showCamps
+      this.showCamps = !this.showCamps
     }
   },
-  components:{
+  components: {
     show_campaigns
   }
 

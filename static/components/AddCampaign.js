@@ -1,7 +1,7 @@
 const AddCamp = {
-  template: `
+    template: `
   
-    <div class="d-flex justify-content-center align-items-center">
+    <div class="d-flex justify-content-center align-items-center appear">
         <div class="card shadow-lg p-3 mb-5 bg-body rounded" style="width: 40%;">
             <h3 class="card-title text-center mb-4">Campaign</h3>
 
@@ -52,21 +52,21 @@ const AddCamp = {
     
     `,
 
-    data(){
-        return{
-           name:"",
-           description:"",
-           startDate:"",
-           endDate:"",
-           budget:"",
-           goal:"",
-           visibility:""
+    data() {
+        return {
+            name: "",
+            description: "",
+            startDate: "",
+            endDate: "",
+            budget: "",
+            goal: "",
+            visibility: ""
         }
     },
 
 
-    methods:{
-        go_to_dashboard(){
+    methods: {
+        go_to_dashboard() {
 
             switch (this.$store.getters.getRole) {
                 case "spons":
@@ -74,42 +74,42 @@ const AddCamp = {
                     break;
                 case "infl":
                     this.$router.push("/dashboard-infl");
-                }
+            }
         },
 
-        Handle_Click(){
-            if (this.name.length === 0){
+        Handle_Click() {
+            if (this.name.length === 0) {
                 alert('Must Enter a Name')
-            }else if (this.description.length===0){
+            } else if (this.description.length === 0) {
                 alert('Must Enter a description')
-            }else if (this.startDate.length===0){
+            } else if (this.startDate.length === 0) {
                 alert('Must Enter a start date')
-            }else if (this.endDate.length===0){
+            } else if (this.endDate.length === 0) {
                 alert('Must Enter an end date')
-            }else if (this.budget.length===0){
+            } else if (this.budget.length === 0) {
                 alert('Must Enter a budget')
-            }else if (this.goal.length===0){
+            } else if (this.goal.length === 0) {
                 alert('Must Enter a goal')
-            }else{
+            } else {
                 let currentDate = new Date();
                 let inputStart = new Date(this.startDate);
                 let inputEnd = new Date(this.endDate);
-                console.log(inputEnd,inputStart)
-                if (inputEnd<currentDate){
+                console.log(inputEnd, inputStart)
+                if (inputEnd < currentDate) {
                     alert('Cant enter the end date in the past!!')
 
                 }
-                else if (inputEnd<inputStart){
+                else if (inputEnd < inputStart) {
                     alert('End date in the past of start date')
                 }
-                else{
+                else {
                     this.Create_Campaign();
 
                 }
             }
         },
 
-        async Create_Campaign(){
+        async Create_Campaign() {
             console.log(this.name)
             console.log(this.description)
             console.log(this.startDate)
@@ -117,8 +117,8 @@ const AddCamp = {
             console.log(this.budget)
             console.log(this.goal)
             console.log(this.visibility)
-            if (this.visibility===""){
-                this.visibility=false
+            if (this.visibility === "") {
+                this.visibility = false
             }
             const origin = window.location.origin;
             const url = `${origin}/add_campaign`;
@@ -126,43 +126,43 @@ const AddCamp = {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
                 body: JSON.stringify({
                     name: this.name,
                     description: this.description,
                     startDate: this.startDate,
-                    endDate:this.endDate,
-                    budget:this.budget,
-                    goal:this.goal,
-                    visibility:this.visibility
-          }),
-        });
+                    endDate: this.endDate,
+                    budget: this.budget,
+                    goal: this.goal,
+                    visibility: this.visibility
+                }),
+            });
 
-        if (res.ok) {
-          const data = await res.json();
-          console.log(data);
-          // Handle successful sign up, e.g., redirect or store token
-          switch (this.$store.getters.getRole) {
-                case "spons":
-                    this.$router.push("/dashboard-spons");
-                    break;
-                case "infl":
-                    this.$router.push("/dashboard-infl");
-                    
+            if (res.ok) {
+                const data = await res.json();
+                console.log(data);
+                // Handle successful sign up, e.g., redirect or store token
+                switch (this.$store.getters.getRole) {
+                    case "spons":
+                        this.$router.push("/dashboard-spons");
+                        break;
+                    case "infl":
+                        this.$router.push("/dashboard-infl");
+
                 }
-        } else if(res.status===403 || res.status===401){
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
-          const errorData = await res.json();
-          console.error("Addition failed:", errorData);
-          // Handle sign up error
-        }
+            } else {
+                const errorData = await res.json();
+                console.error("Addition failed:", errorData);
+                // Handle sign up error
+            }
 
 
         }

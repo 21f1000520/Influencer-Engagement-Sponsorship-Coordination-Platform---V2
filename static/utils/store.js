@@ -4,17 +4,17 @@ const store = new Vuex.Store({
     role: "",
   },
   getters: {
-    getLoginState(state){
-      console.log(sessionStorage.getItem('email'),'inside')
-      if (sessionStorage.getItem('email')){
-        state.loggedIn=true;
+    getLoginState(state) {
+      console.log(sessionStorage.getItem('email'), 'inside')
+      if (sessionStorage.getItem('email')) {
+        state.loggedIn = true;
         return true;
       }
       return state.loggedIn;
     },
-    getRole(state){
-      if (sessionStorage.getItem('role')){
-        state.role=sessionStorage.getItem('role');
+    getRole(state) {
+      if (sessionStorage.getItem('role')) {
+        state.role = sessionStorage.getItem('role');
         return state.role;
       }
       return state.role;
@@ -25,8 +25,8 @@ const store = new Vuex.Store({
       state.loggedIn = true;
     },
     logout(state) {
-      state.loggedIn = false;
-      state.role=""
+      Object.assign(state.loggedIn, false)
+      state.role = ""
     },
     setRole(state, role) {
       state.role = role;

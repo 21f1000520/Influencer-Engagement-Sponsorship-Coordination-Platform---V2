@@ -77,7 +77,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/activate_spons/<id>', methods=['GET'])
     @roles_required('admin')
     def activate_inst(id):
-
+        cache.clear()
         user = user_datastore.find_user(id=id)
         if not user:
             return jsonify({'message': 'user not present'}), 404
@@ -98,7 +98,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/deactivate_spons/<id>')
     @roles_required('admin')
     def deactivate_inst(id):
-
+        cache.clear()
         user = user_datastore.find_user(id=id)
         if not user:
             return jsonify({'message': 'user not present'}), 404
@@ -119,7 +119,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/switch-flag/<id>')
     @roles_required('admin')
     def flag(id):
-
+        cache.clear()
         user = user_datastore.find_user(id=id)
         if not user:
             return jsonify({'message': 'user not present'}), 404
@@ -204,6 +204,7 @@ def create_admin_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
     @app.route('/switch-flag-camp/<id>')
     @roles_required('admin')
     def flag_camp(id):
+        cache.clear()
         target = campaigns.query.filter_by(id=id).first()
         if not target:
             return jsonify({'message': 'no such campaign'})

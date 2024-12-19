@@ -4,10 +4,10 @@
 const Navbar = {
   template: `
     <nav  class="h2 navbar navbar-expand-sm navbar-dark " >
-      <i v-if="!store.getters.getLoginState" class="bi bi-lock-fill" style="position: absolute;right: 10px;"></i>
-      <i v-if="store.getters.getLoginState" class="bi bi-unlock" style="position: absolute;right: 10px;"></i>
+      <i v-if="!store.getters.getLoginState" class="bi bi-lock-fill" style="position: absolute;right: 10px; top:15px"></i>
+      <i v-if="store.getters.getLoginState" class="bi bi-unlock" style="position: absolute;right: 10px; top:15px"></i>
       
-      <img src="/static/images/favicon_sni.png" alt="" width="50" height="50" style="position: absolute;left: 10px;">
+      <img src="/static/images/favicon_sni.png" alt="" width="50" height="50" style="position: absolute;left: 10px; top:10px">
       <div class="container-fluid d-flex justify-content-center gap-5">
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
@@ -36,7 +36,7 @@ const Navbar = {
                 </li>
 
                 <li class="nav-item" v-if="store.getters.getLoginState"   >
-                    <button type="button" class="btn btn-danger shadow"  @click="logout">Logout</button>
+                    <button type="button" class="btn btn-bg-custom shadow"  @click="logout">Logout</button>
                 </li>
             </ul>
           </div>
@@ -44,10 +44,12 @@ const Navbar = {
       </nav>
   `,
 
-  data(){
-    return{
-    LoginState:{true:"&#128994",false:"&#128997"}}
+  data() {
+    return {
+      LoginState: { true: "&#128994", false: "&#128997" }
+    }
   },
+
 
   methods: {
     logout() {
@@ -55,20 +57,24 @@ const Navbar = {
       sessionStorage.clear();
 
       // clear vuex login info
-      this.$store.commit("logout");
-      this.$store.commit("setRole", null);
-      console.log(this.$store.getters.getLoginState,'login state after logout');
-      this.$router.push("/login");
+      this.store.commit("logout");
+      this.store.commit("setRole", null);
+      console.log(this.isLoggedIn, 'login state after logout');
       this.$router.go();
+      // this.$forceUpdate()
 
     },
 
   },
   computed: {
     store() {
-      console.log(this.$store.getters.getLoginState,'login state');
+      console.log(this.$store.getters.getLoginState, 'login state');
       return this.$store;
     },
+
+    isLoggedIn() {
+      return this.$store.getters.getLoginState
+    }
   },
 };
 

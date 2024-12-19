@@ -1,9 +1,9 @@
 
-const camp_dashboard={
-    template:`
+const camp_dashboard = {
+    template: `
     <div class="popup" @click.self="$emit('ClosePopup')"> 
-        <div class="popup-inner shadow-lg" style="max-width: 100%;" >
-
+        <div class="popup-inner shadow-lg" style="max-width: 100%; max-height: 90%" >
+            <div class="badge rounded-pill px-4 py-0 shadow" style="background: rgba(224, 130, 49, 0.52); margin-bottom:3%"><h1 class="display-5">{{name}}</h1></div>
             <form class="row g-3">
                 <div class="col-4">
                     <input type="text" class="form-control" placeholder="Search Influencers by Name" v-model="Search_term_inf"  >
@@ -164,297 +164,298 @@ const camp_dashboard={
     </div>
     `,
 
-    props:{
-        id:{
-            type:Number
+    props: {
+        id: {
+            type: Number
         },
-        all_influencers:{type:Array},
-        sent_reqs:{type:Array},
-        recieved_reqs:{type:Array},
+        all_influencers: { type: Array },
+        sent_reqs: { type: Array },
+        recieved_reqs: { type: Array },
+        name: { type: String },
     },
 
-    data(){
-        return{
-        sent_influencers:[],
-        recieved_influencers:[],
-        running_req_inf:[],
-        Search_term_inf:"",
-        platforms:[],
+    data() {
+        return {
+            sent_influencers: [],
+            recieved_influencers: [],
+            running_req_inf: [],
+            Search_term_inf: "",
+            platforms: [],
         }
     },
 
-    computed:{
+    computed: {
 
-        untouched_influencer(){
-            let unt_inf=[];
-            let sent_inf=[];
-            let recieved_inf=[];
-            let running_req=[];
+        untouched_influencer() {
+            let unt_inf = [];
+            let sent_inf = [];
+            let recieved_inf = [];
+            let running_req = [];
             for (let i = 0; i < this.all_influencers.length; i++) {
-                let flag_sent=false;
-                let flag_recieved=false;
+                let flag_sent = false;
+                let flag_recieved = false;
                 let inf = this.all_influencers[i];
-                if (!inf.flag){
+                if (!inf.flag) {
                     for (let j = 0; j < this.sent_reqs.length; j++) {
                         let sent = this.sent_reqs[j];
-                        if (inf.id===sent.influencer_id && this.id===sent.campaign_id){
-                            console.log(inf.id,sent.influencer_id,'touched sent')
+                        if (inf.id === sent.influencer_id && this.id === sent.campaign_id) {
+                            console.log(inf.id, sent.influencer_id, 'touched sent')
                             flag_sent = true;
                             inf.status = sent.status
                             inf.req_id = sent.id
-                            if (sent.status==='accepted'){
+                            if (sent.status === 'accepted') {
                                 running_req.push(inf)
                             }
                             break;
-                        } 
+                        }
                     };
-                    
+
                     for (let j = 0; j < this.recieved_reqs.length; j++) {
                         let recieved = this.recieved_reqs[j];
-                        console.log(inf.id,recieved.influencer_id)
-                        if (inf.id===recieved.influencer_id && this.id===recieved.campaign_id){
-                            console.log(inf.id,recieved.influencer_id,'touched recieved')
+                        console.log(inf.id, recieved.influencer_id)
+                        if (inf.id === recieved.influencer_id && this.id === recieved.campaign_id) {
+                            console.log(inf.id, recieved.influencer_id, 'touched recieved')
                             flag_recieved = true;
                             inf.status = recieved.status
                             inf.req_id = recieved.id
-                            if (recieved.status==='accepted'){
+                            if (recieved.status === 'accepted') {
                                 running_req.push(inf)
                             }
                             break;
-                        } 
+                        }
                     };
-                
-                    if (!flag_sent && !flag_recieved){
+
+                    if (!flag_sent && !flag_recieved) {
                         unt_inf.push(inf)
                     };
-                    if (flag_sent){
+                    if (flag_sent) {
                         sent_inf.push(inf)
                     };
-                    if (flag_recieved){
+                    if (flag_recieved) {
                         recieved_inf.push(inf)
                     };
                 }
             }
-            this.sent_influencers=sent_inf;
-            this.recieved_influencers=recieved_inf;
-            this.running_req_inf=running_req;
+            this.sent_influencers = sent_inf;
+            this.recieved_influencers = recieved_inf;
+            this.running_req_inf = running_req;
             return unt_inf
         },
 
     },
 
-    methods:{
-        check_plats(array1,array2){
-            const found = array1.some(r=> array2.includes(r))
+    methods: {
+        check_plats(array1, array2) {
+            const found = array1.some(r => array2.includes(r))
             return found
         },
 
-        search_inf(){
+        search_inf() {
             // console.log(this.Search_term_inf)
-            
-            if (this.Search_term_inf.length>0 && this.platforms.length===0){
-                let new_array=[];
+
+            if (this.Search_term_inf.length > 0 && this.platforms.length === 0) {
+                let new_array = [];
                 let reg_search = new RegExp(this.Search_term_inf, 'gi')
                 console.log(reg_search)
-                for (let element of this.all_influencers){
-                    console.log(element.fname,element.lname)
-                    if (element.fname.search(reg_search)>=0){
+                for (let element of this.all_influencers) {
+                    console.log(element.fname, element.lname)
+                    if (element.fname.search(reg_search) >= 0) {
                         console.log('found in first')
                         new_array.push(element)
-                    }else if (element.lname.search(reg_search)>=0){
+                    } else if (element.lname.search(reg_search) >= 0) {
                         console.log('found in last')
                         new_array.push(element)
-                    }else{
+                    } else {
                         console.log("not found")
                     }
                 }
-                this.all_influencers=new_array;
+                this.all_influencers = new_array;
 
-            }else if (this.Search_term_inf.length>0 && this.platforms.length>0){
+            } else if (this.Search_term_inf.length > 0 && this.platforms.length > 0) {
                 console.log('name and plateforms')
-                let new_array=[];
+                let new_array = [];
                 let reg_search = new RegExp(this.Search_term_inf, 'gi')
-                for (let element of this.all_influencers){
-                    if (this.check_plats(element.plateforms,this.platforms)){
-                        if (element.fname.search(reg_search)>=0){
+                for (let element of this.all_influencers) {
+                    if (this.check_plats(element.plateforms, this.platforms)) {
+                        if (element.fname.search(reg_search) >= 0) {
                             console.log('found in first')
                             new_array.push(element)
-                        }else if (element.lname.search(reg_search)>=0){
+                        } else if (element.lname.search(reg_search) >= 0) {
                             console.log('found in last')
                             new_array.push(element)
-                        }else{
+                        } else {
                             console.log("not found")
                         }
 
                     }
                 }
-                this.all_influencers=new_array;
-            }else if (this.Search_term_inf.length===0 && this.platforms.length>0){
+                this.all_influencers = new_array;
+            } else if (this.Search_term_inf.length === 0 && this.platforms.length > 0) {
                 console.log('only plateforms')
-                let new_array=[];
+                let new_array = [];
                 let reg_search = new RegExp(this.Search_term_inf, 'gi')
-                for (let element of this.all_influencers){
-                    if (this.check_plats(element.plateforms,this.platforms)){
+                for (let element of this.all_influencers) {
+                    if (this.check_plats(element.plateforms, this.platforms)) {
                         new_array.push(element)
 
-                    }else{
+                    } else {
                         console.log('not found')
                     }
                 }
-                this.all_influencers=new_array;
+                this.all_influencers = new_array;
             }
         },
-        reload_inf(){
+        reload_inf() {
             console.log('reload inf')
             this.$emit('recal_all_inf')
         },
 
-        async Delete_sent_to_infl(id){
-            console.log('delete',id)
+        async Delete_sent_to_infl(id) {
+            console.log('delete', id)
             const origin = window.location.origin;
             const url = `${origin}/delete_req_to_infl/${id}`;
             const res = await fetch(url, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
-                });
-            if (res.ok){
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
+            });
+            if (res.ok) {
                 const datas = await res.json();
                 // this.all_influencers = datas;
                 console.log(datas);
                 this.$emit('recal_sent_inf')
-                
-            }else if(res.status===403 || res.status===401){
+
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
+            } else {
                 const errorData = await res.json();
                 console.error("Could not delete", errorData);
             }
         },
 
-        async Delete_sent_to_spons(id){
-            console.log('delete',id)
+        async Delete_sent_to_spons(id) {
+            console.log('delete', id)
             const origin = window.location.origin;
             const url = `${origin}/delete_req_to_spons/${id}`;
             const res = await fetch(url, {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
-                });
-            if (res.ok){
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
+            });
+            if (res.ok) {
                 const datas = await res.json();
                 // this.all_influencers = datas;
                 console.log(datas);
                 this.$emit('recal_sent_spons')
-                
-            }else if(res.status===403 || res.status===401){
+
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
+            } else {
                 const errorData = await res.json();
                 console.error("Could not delete to spons", errorData);
             }
         },
-        async Reject_sent_to_spons(id){
-            console.log('reject',id)
+        async Reject_sent_to_spons(id) {
+            console.log('reject', id)
             const origin = window.location.origin;
             const url = `${origin}/reject_req_to_spons/${id}`;
             const res = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
-                });
-            if (res.ok){
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
+            });
+            if (res.ok) {
                 const datas = await res.json();
                 // this.all_influencers = datas;
                 console.log(datas);
                 this.$emit('recal_sent_spons')
-                
-            }else if(res.status===403 || res.status===401){
+
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
+            } else {
                 const errorData = await res.json();
                 console.error("Could not reject to spons", errorData);
             }
         },
-        async Accept_sent_to_spons(id){
-            console.log('reject',id)
+        async Accept_sent_to_spons(id) {
+            console.log('reject', id)
             const origin = window.location.origin;
             const url = `${origin}/accept_req_to_spons/${id}`;
             const res = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
-                });
-            if (res.ok){
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
+            });
+            if (res.ok) {
                 const datas = await res.json();
                 // this.all_influencers = datas;
                 console.log(datas);
                 this.$emit('recal_sent_spons')
-                
-            }else if(res.status===403 || res.status===401){
+
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
+            } else {
                 const errorData = await res.json();
                 console.error("Could not accept to spons", errorData);
             }
         },
 
-        async Send_Req(id){
+        async Send_Req(id) {
             // /send_ad_req_to_infl/<c_id>/<infl_id>
-            console.log('send req to infl',id)
+            console.log('send req to infl', id)
             const origin = window.location.origin;
             const url = `${origin}/send_ad_req_to_infl/${this.id}/${id}`;
             const res = await fetch(url, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
-                    "Authentication-Token":sessionStorage.getItem("token"),
-                    },
-                });
+                    "Authentication-Token": sessionStorage.getItem("token"),
+                },
+            });
 
-            if (res.ok){
+            if (res.ok) {
                 const datas = await res.json();
                 // this.all_influencers = datas;
                 console.log(datas);
                 // this.Get_all_sent_to_infl();
                 this.$emit('recal_sent_inf')
 
-            }else if(res.status===403 || res.status===401){
+            } else if (res.status === 403 || res.status === 401) {
                 console.error("Forbidden Request");
                 sessionStorage.clear()
                 this.$store.commit("logout");
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            }else {
+            } else {
                 const errorData = await res.json();
                 console.error("Could not send req to infl", errorData);
             }
