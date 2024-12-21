@@ -1,5 +1,7 @@
-already_paid,budget,description,name,progress_%,sponsor_name
-25000.0,50000.0,Show S24 every 5 minutes,Samsung S24,54.85,Samsung India
-50000.0,50000.0,Show every video ,Face powder,100,First Sponsor
-4500.0,5000.0,Ye bechana  h ,Lipstick Red,99.07,First Sponsor
-50000.0,50000.0,Great Budget Phone,Samsung A series,100,Samsung India
+budget,description,influencer_name,name,progress_%,sponsor_name
+50000.0,Show S24 every 5 minutes,Rocky Balboa,Samsung S24,65.9,Samsung India
+50000.0,Show S24 every 5 minutes,Abhishek Sharma,Samsung S24,65.9,Samsung India
+50000.0,Show every video ,Abhishek Sharma,Face powder,100,First Sponsor
+5000.0,Ye bechana  h ,Abhishek Sharma,Lipstick Red,100,First Sponsor
+50000.0,Great Budget Phone,Abhishek Sharma,Samsung A series,100,Samsung India
+50000.0,Show every video ,Rocky Balboa,Face powder,100,First Sponsor

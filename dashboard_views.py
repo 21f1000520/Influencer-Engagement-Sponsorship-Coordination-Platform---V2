@@ -134,6 +134,12 @@ def create_dashboard_views(app, user_datastore: SQLAlchemyUserDatastore, cache):
         goal = data.get("goal")
         visibility = data.get("visibility")
 
+        existing = campaigns.query.filter((campaigns.name == name) & (
+            campaigns.s_id == current_user.id)).first()
+        if existing:
+            return jsonify({'message':'already exists'}), 406
+        
+
         camp_new = campaigns(name=name, description=description,
                              start_date=startDate, end_date=endDate,
                              budget=budget, goals=goal, visibility=visibility, s_id=current_user.id)

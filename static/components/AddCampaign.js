@@ -11,6 +11,11 @@ const AddCamp = {
                             placeholder="Enter name for the Campaign (Required)" id="name" required>
                         <div id="email_validation" v-if="this.name.length===0">Enter a Name</div>
                     </div>
+                    <div class="form-group alert alert-danger py-1"  v-show="this.alreadyExistError"> 
+                        <i class="bi bi-exclamation-triangle-fill"></i> Campaign Already Exists!!
+                        Enter different Campaign Name
+                    </div>
+
                     <div class="form-group mb-4">
                         <label for="description">Description</label>
                         <input type="text" class="form-control" v-model="description" aria-describedby="nameHelp"
@@ -43,8 +48,10 @@ const AddCamp = {
                         <label class="form-check-label" for="visibility">Make it Public?</label>
                     </div>
                 
-                    <div class="text-center mb-4" style="margin-top: 5%;">
+                    <div class="text-center mb-0 d-flex justify-content-center" style="margin-top: 5%;">
                         <button class="btn btn-success w-100" id="create" @click='Handle_Click'>Create</button>
+                    </div>
+                    <div class="text-center mb-4 d-flex justify-content-center">
                         <button class="btn btn-primary btn-sm" @click="go_to_dashboard">Go Back</button>
                     </div>
         </div>
@@ -60,7 +67,9 @@ const AddCamp = {
             endDate: "",
             budget: "",
             goal: "",
-            visibility: ""
+            visibility: "",
+            alreadyExistError:false,
+
         }
     },
 
@@ -158,10 +167,15 @@ const AddCamp = {
                 this.$store.commit("setRole", null);
                 this.$router.push("/login");
                 this.$router.go()
-            } else {
+            } 
+            else {
                 const errorData = await res.json();
                 console.error("Addition failed:", errorData);
-                // Handle sign up error
+                // Handle error
+                if (errorData.message === 'already exists'){
+                    this.alreadyExistError=true
+                    setTimeout(() => this.alreadyExistError = false, 3000)
+                }
             }
 
 
